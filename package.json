@@ -1,0 +1,27 @@
+{
+  "name": "website-analytics-tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild dist/index.js --bundle --outfile=bundle/bundle.js --watch --minify",
+    "compile": "npx tsc --watch",
+    "server": "npx live-server --port=3005 --cors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmbdeir/website-analytics-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmbdeir/website-analytics-tracker/issues"
+  },
+  "homepage": "https://github.com/mmbdeir/website-analytics-tracker#readme",
+  "description": "",
+  "devDependencies": {
+    "esbuild": "^0.25.10",
+    "live-server": "^1.2.2",
+    "typescript": "^5.9.3"
+  }
+}
