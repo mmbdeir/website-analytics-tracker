@@ -1,1 +1,1 @@
-"use strict";(()=>{function t(){document.addEventListener("click",o=>{o.target.tagName.toLowerCase()==="button"&&console.log("Button click!!")})}t();})();
+"use strict";(()=>{function t(){document.addEventListener("click",i=>{i.target.tagName.toLowerCase()==="button"&&console.log("Button click!!")})}var n,s=3e3;function c(){alert("Session is done due to inactivity")}function o(){clearTimeout(n),n=setTimeout(c,s)}function e(){window.onscroll=o,window.onclick=o,window.onmousemove=o,window.onload=o,window.onkeydown=o,window.ontouchstart=o}e();t();})();
