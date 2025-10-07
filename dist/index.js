@@ -1,7 +1,9 @@
 import { trackButtons } from "./trackers/click";
 import { session } from "./trackers/session";
-// document.addEventListener("DOMContentLoaded", () => {
+import { performanceDomLoadSpeed } from "./trackers/performance";
+document.addEventListener("DOMContentLoaded", () => {
+    trackButtons();
+});
+performanceDomLoadSpeed();
 session();
-trackButtons();
-// });
 //# sourceMappingURL=index.js.map

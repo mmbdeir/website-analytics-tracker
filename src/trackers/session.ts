@@ -3,7 +3,7 @@ let timer: NodeJS.Timeout;
 let time = 3 * 1000;
 
 function endSession() {
-  alert("Session is done due to inactivity");
+  console.log("Session is done due to inactivity");
 }
 
 function resetTimer() {
