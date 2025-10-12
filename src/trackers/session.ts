@@ -1,34 +1,31 @@
 import { throttle } from "../reusables/throttle";
-
-let timer: NodeJS.Timeout;
-
 let time = 1000;
-
 function newSession() {
   console.log("A new session");
 }
-
 function sessionManager() {
-  let ts = Date.now() - Number(localStorage.getItem("at-sess-timestamp"));
-  localStorage.setItem("at-sess-timestamp", Date.now().toString());
-  if (ts > time) {
+  let timeSinceLastUpdate =
+    Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+  localStorage.setItem("at-last-active", Date.now().toString());
+  if (timeSinceLastUpdate > time) {
     newSession();
-  } else {
-    console.log("hiiiiiii");
   }
 }
 
-let resettimestamp = throttle(function () {
-  localStorage.setItem("at-sess-timestamp", Date.now().toString());
-  console.log("Hiiiii");
-}, 3000);
+const updateActivity = throttle(() => {
+  let timeSinceLastUpdate =
+    Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+  localStorage.setItem("at-last-active", Date.now().toString());
+  if (timeSinceLastUpdate > time) {
+    newSession();
+  }
+}, time);
 
 export function session() {
   sessionManager();
-  window.onclick = resettimestamp;
-  window.onscroll = resettimestamp;
-  window.onkeydown = resettimestamp;
-  window.onmousemove = resettimestamp;
-  window.onload = resettimestamp;
-  window.ontouchstart = resettimestamp;
+  window.onclick = updateActivity;
+  window.onscroll = updateActivity;
+  window.onkeydown = updateActivity;
+  window.onmousemove = updateActivity;
+  window.ontouchstart = updateActivity;
 }
