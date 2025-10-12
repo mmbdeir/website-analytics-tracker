@@ -2,40 +2,33 @@ import { throttle } from "../reusables/throttle";
 
 let timer: NodeJS.Timeout;
 
-let time = 1000 * 60 * 30;
+let time = 1000;
 
-function sessionPrint() {
+function newSession() {
   console.log("A new session");
 }
 
-function og() {
+function sessionManager() {
   let ts = Date.now() - Number(localStorage.getItem("at-sess-timestamp"));
+  localStorage.setItem("at-sess-timestamp", Date.now().toString());
   if (ts > time) {
-    localStorage.setItem("at-sess-timestamp", Date.now().toString());
-    sessionPrint();
-    console.log("hi");
+    newSession();
   } else {
-    localStorage.setItem("at-sess-timestamp", Date.now().toString());
-    console.log("hiiiiiiiiii");
+    console.log("hiiiiiii");
   }
 }
 
-let cs = throttle(function () {
+let resettimestamp = throttle(function () {
   localStorage.setItem("at-sess-timestamp", Date.now().toString());
+  console.log("Hiiiii");
 }, 3000);
 
-function resetTimer() {
-  if (timer) clearTimeout(timer);
-  timer = setTimeout(sessionPrint, time);
-  cs();
-}
-
 export function session() {
-  og();
-  window.onclick = resetTimer;
-  window.onscroll = resetTimer;
-  window.onkeydown = resetTimer;
-  window.onmousemove = resetTimer;
-  window.onload = resetTimer;
-  window.ontouchstart = resetTimer;
+  sessionManager();
+  window.onclick = resettimestamp;
+  window.onscroll = resettimestamp;
+  window.onkeydown = resettimestamp;
+  window.onmousemove = resettimestamp;
+  window.onload = resettimestamp;
+  window.ontouchstart = resettimestamp;
 }
