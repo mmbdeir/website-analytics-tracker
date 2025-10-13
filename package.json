@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild dist/index.js --bundle --outfile=bundle/bundle.js --watch --minify",
+    "build": "esbuild dist/index.js --bundle --outfile=bundle/bundle.js --watch",
     "compile": "npx tsc --watch",
     "server": "npx live-server --port=3005 --cors"
   },

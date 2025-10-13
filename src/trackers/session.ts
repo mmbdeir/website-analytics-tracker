@@ -1,5 +1,5 @@
 import { throttle } from "../reusables/throttle";
-let time = 1000;
+let time = 2000;
 function newSession() {
   console.log("A new session");
 }
@@ -15,11 +15,12 @@ function sessionManager() {
 const updateActivity = throttle(() => {
   let timeSinceLastUpdate =
     Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+  console.log("Time since last update: " + timeSinceLastUpdate);
   localStorage.setItem("at-last-active", Date.now().toString());
   if (timeSinceLastUpdate > time) {
     newSession();
   }
-}, time);
+}, 1500);
 
 export function session() {
   sessionManager();

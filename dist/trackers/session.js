@@ -1,18 +1,29 @@
-let timer;
-let time = 3 * 1000;
-function endSession() {
-    console.log("Session is done due to inactivity");
+import { throttle } from "../reusables/throttle";
+let time = 2000;
+function newSession() {
+    console.log("A new session");
 }
-function resetTimer() {
-    clearTimeout(timer);
-    timer = setTimeout(endSession, time);
+function sessionManager() {
+    let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+    localStorage.setItem("at-last-active", Date.now().toString());
+    if (timeSinceLastUpdate > time) {
+        newSession();
+    }
 }
+const updateActivity = throttle(() => {
+    let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+    console.log("Time since last update: " + timeSinceLastUpdate);
+    localStorage.setItem("at-last-active", Date.now().toString());
+    if (timeSinceLastUpdate > time) {
+        newSession();
+    }
+}, 1500);
 export function session() {
-    window.onscroll = resetTimer;
-    window.onclick = resetTimer;
-    window.onmousemove = resetTimer;
-    window.onload = resetTimer;
-    window.onkeydown = resetTimer;
-    window.ontouchstart = resetTimer;
+    sessionManager();
+    window.onclick = updateActivity;
+    window.onscroll = updateActivity;
+    window.onkeydown = updateActivity;
+    window.onmousemove = updateActivity;
+    window.ontouchstart = updateActivity;
 }
 //# sourceMappingURL=session.js.map
