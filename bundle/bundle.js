@@ -22,33 +22,31 @@
   }
 
   // dist/trackers/session.js
-  var time = 2e3;
+  var time = 60 * 30 * 1e3;
   function newSession() {
     console.log("A new session");
   }
-  function sessionManager() {
-    let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
-    localStorage.setItem("at-last-active", Date.now().toString());
-    if (timeSinceLastUpdate > time) {
-      newSession();
+  var sessionManager = class {
+    static sessionCounter() {
+      checkForNewSession();
+      window.onclick = updateActivity;
+      window.onscroll = updateActivity;
+      window.onkeydown = updateActivity;
+      window.onmousemove = updateActivity;
+      window.ontouchstart = updateActivity;
     }
-  }
-  var updateActivity = throttle(() => {
+  };
+  function checkForNewSession() {
     let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
     console.log("Time since last update: " + timeSinceLastUpdate);
     localStorage.setItem("at-last-active", Date.now().toString());
     if (timeSinceLastUpdate > time) {
       newSession();
     }
-  }, 1500);
-  function session() {
-    sessionManager();
-    window.onclick = updateActivity;
-    window.onscroll = updateActivity;
-    window.onkeydown = updateActivity;
-    window.onmousemove = updateActivity;
-    window.ontouchstart = updateActivity;
   }
+  var updateActivity = throttle(() => {
+    checkForNewSession();
+  }, 1500);
 
   // dist/trackers/performance.js
   function performanceDomLoadSpeed() {
@@ -65,5 +63,5 @@
     trackButtons();
   });
   performanceDomLoadSpeed();
-  session();
+  sessionManager.sessionCounter();
 })();
