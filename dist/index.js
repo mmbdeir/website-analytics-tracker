@@ -6,4 +6,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 performanceDomLoadSpeed();
 sessionManager.sessionCounter();
+sessionManager.sessionTimer();
 //# sourceMappingURL=index.js.map

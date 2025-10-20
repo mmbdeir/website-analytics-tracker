@@ -7,3 +7,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 performanceDomLoadSpeed();
 sessionManager.sessionCounter();
+sessionManager.sessionTimer();
