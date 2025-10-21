@@ -1,1 +1,1 @@
-{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../src/trackers/session.ts"],"names":[],"mappings":"AAWA,qBAAa,cAAc;IACzB,MAAM,CAAC,cAAc;IASrB,MAAM,CAAC,IAAI,SAAc;IACzB,MAAM,CAAC,YAAY;CASpB"}
+{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../src/trackers/session.ts"],"names":[],"mappings":"AAWA,qBAAa,cAAc;IACzB,MAAM,CAAC,cAAc;IASrB,MAAM,CAAC,IAAI,SAAc;IAEzB,MAAM,CAAC,YAAY;CAMpB"}

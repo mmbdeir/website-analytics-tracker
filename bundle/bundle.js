@@ -36,16 +36,12 @@
       window.onmousemove = updateActivity;
       window.ontouchstart = updateActivity;
     }
-    // This should be to get total time, but there should be a new class to get time per page in maybe session manager
     static time = Date.now();
     static sessionTimer() {
       let sessionStartTime = localStorage.getItem("session-start-time");
       if (!sessionStartTime) {
         localStorage.setItem("session-start-time", Date.now().toString());
       }
-      window.onabort = () => {
-        localStorage.removeItem("session-start-time");
-      };
     }
   };
   function checkForNewSession() {
@@ -53,6 +49,7 @@
     console.log("Time since last update: " + timeSinceLastUpdate);
     localStorage.setItem("at-last-active", Date.now().toString());
     if (timeSinceLastUpdate > time) {
+      localStorage.removeItem("session-start-time");
       newSession();
     }
   }
