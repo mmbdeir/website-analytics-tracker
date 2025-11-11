@@ -1,2 +1,2 @@
-export declare function performanceDomLoadSpeed(): void;
+export declare function loadSpeed(): void;
 //# sourceMappingURL=performance.d.ts.map

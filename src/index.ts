@@ -1,10 +1,12 @@
 import { trackButtons } from "./trackers/click";
 import { sessionManager } from "./trackers/session";
-import { performanceDomLoadSpeed } from "./trackers/performance";
+import { loadSpeed } from "./trackers/performance";
 
 document.addEventListener("DOMContentLoaded", () => {
   trackButtons();
 });
-performanceDomLoadSpeed();
+
+// Add screentime heatmap or analytics/statistics
+loadSpeed();
 sessionManager.sessionCounter();
 sessionManager.sessionTimer();
