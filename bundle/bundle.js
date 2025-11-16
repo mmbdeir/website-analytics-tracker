@@ -69,6 +69,7 @@
     // From what page this user came from to get to this page
     static pageLeft() {
       document.addEventListener("beforeunload", (e) => {
+        e.preventDefault();
         navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({ pageLeft: window.location.pathname }));
       });
     }
@@ -88,10 +89,11 @@
         originalReplaceState.apply(history, args);
         navPaths.push(location.pathname);
       };
-      window.addEventListener("beforeunload", () => {
-        navPaths.forEach((e, i) => {
+      window.addEventListener("beforeunload", (e) => {
+        e.preventDefault();
+        navPaths.forEach((e2, i) => {
           navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
-            page: e,
+            page: e2,
             pageFrom: i > 0 ? navPaths[i - 1] : void 0,
             pageTo: navPaths[i + 1]
           }));
