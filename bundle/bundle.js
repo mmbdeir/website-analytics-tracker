@@ -24,24 +24,16 @@
   // dist/trackers/session.js
   var time = 60 * 60 * 1e3;
   function newSession() {
-    console.log("prev sess time:" + (Date.now() - Number(localStorage.getItem("session-start-time"))));
-    localStorage.removeItem("session-start-time");
     localStorage.setItem("session-start-time", Date.now().toString());
   }
   var SessionManager = class {
     static sessionCounter() {
       checkForNewSession();
-      window.onclick = updateActivity;
-      window.onscroll = updateActivity;
-      window.onkeydown = updateActivity;
-      window.onmousemove = updateActivity;
-      window.ontouchstart = updateActivity;
-    }
-    static sessionTimer() {
-      let sessionStartTime = localStorage.getItem("session-start-time");
-      if (!sessionStartTime) {
-        localStorage.setItem("session-start-time", Date.now().toString());
-      }
+      window.addEventListener("click", updateActivity);
+      window.addEventListener("scroll", updateActivity);
+      window.addEventListener("keydown", updateActivity);
+      window.addEventListener("mousemove", updateActivity);
+      window.addEventListener("touchstart", updateActivity);
     }
   };
   function checkForNewSession() {
@@ -101,6 +93,23 @@
       });
     }
     static scrollDepth() {
+      function getScrollDepthPercent() {
+        const scroll = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        return scroll / maxScroll * 100;
+      }
+      let throttled = throttle(() => {
+        const scrollDepth = getScrollDepthPercent();
+        console.log(scrollDepth);
+      }, 500);
+      window.addEventListener("scroll", () => {
+        throttled();
+      });
+      window.addEventListener("scrollend", () => {
+        setTimeout(() => {
+          throttled();
+        }, 250);
+      });
     }
   };
 
@@ -110,7 +119,7 @@
   });
   loadSpeed();
   SessionManager.sessionCounter();
-  SessionManager.sessionTimer();
   PageSpecific.pageLeft();
   PageSpecific.navPaths();
+  PageSpecific.scrollDepth();
 })();

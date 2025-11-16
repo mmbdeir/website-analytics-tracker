@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // Add screentime heatmap or analytics/statistics
 loadSpeed();
 SessionManager.sessionCounter();
-SessionManager.sessionTimer();
+// SessionManager.sessionTimer();
 PageSpecific.pageLeft();
 PageSpecific.navPaths();
+PageSpecific.scrollDepth();
 //# sourceMappingURL=index.js.map

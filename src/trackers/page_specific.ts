@@ -1,3 +1,5 @@
+import { throttle } from "../reusables/throttle";
+
 export class PageSpecific {
   // Amount of sessions per page
   // - on page open(not reload) a new page session with the pages name from the metadata, and its url
@@ -41,5 +43,27 @@ export class PageSpecific {
       });
     });
   }
-  static scrollDepth() {}
+  static scrollDepth() {
+    function getScrollDepthPercent() {
+      const scroll = window.scrollY;
+      const maxScroll =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      return (scroll / maxScroll) * 100;
+    }
+
+    let throttled = throttle(() => {
+      const scrollDepth = getScrollDepthPercent();
+      console.log(scrollDepth);
+    }, 500);
+
+    window.addEventListener("scroll", () => {
+      throttled();
+    });
+    window.addEventListener("scrollend", () => {
+      setTimeout(() => {
+        throttled();
+      }, 250);
+    });
+  }
 }

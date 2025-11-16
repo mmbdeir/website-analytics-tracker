@@ -1,1 +1,1 @@
-{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../src/trackers/session.ts"],"names":[],"mappings":"AAYA,qBAAa,cAAc;IACzB,MAAM,CAAC,cAAc;IAQrB,MAAM,CAAC,YAAY;CAMpB"}
+{"version":3,"file":"session.d.ts","sourceRoot":"","sources":["../../src/trackers/session.ts"],"names":[],"mappings":"AAOA,qBAAa,cAAc;IACzB,MAAM,CAAC,cAAc;CActB"}
