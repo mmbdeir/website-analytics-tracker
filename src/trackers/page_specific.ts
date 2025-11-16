@@ -44,26 +44,24 @@ export class PageSpecific {
     });
   }
   static scrollDepth() {
+    let maxDepth: number = 0;
+    let clientHeight = document.documentElement.clientHeight;
     function getScrollDepthPercent() {
+      let scrollHeight = document.documentElement.scrollHeight;
+      const maxScroll = scrollHeight - clientHeight;
       const scroll = window.scrollY;
-      const maxScroll =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
+      if (maxScroll <= 0) return 100;
       return (scroll / maxScroll) * 100;
     }
 
-    let throttled = throttle(() => {
-      const scrollDepth = getScrollDepthPercent();
-      console.log(scrollDepth);
-    }, 500);
-
-    window.addEventListener("scroll", () => {
-      throttled();
-    });
     window.addEventListener("scrollend", () => {
-      setTimeout(() => {
-        throttled();
-      }, 250);
+      const currentDepth = getScrollDepthPercent();
+      if (currentDepth > maxDepth) {
+        maxDepth = currentDepth;
+      }
+    });
+    window.addEventListener("beforeunload", () => {
+      // send maxDepth to the server
     });
   }
 }
