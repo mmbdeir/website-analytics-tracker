@@ -3,13 +3,36 @@ export class PageSpecific {
     // - on page open(not reload) a new page session with the pages name from the metadata, and its url
     // From what page this user came from to get to this page
     static pageLeft() {
-        window.addEventListener("beforeunload", (e) => {
-            e.preventDefault();
+        document.addEventListener("beforeunload", (e) => {
             navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({ pageLeft: window.location.pathname }));
         });
     }
-    static visitsPerPage() {
-        // Use the history api
+    // Track what page the user came from and where did he go after
+    static navPaths() {
+        const navPaths = [location.pathname];
+        window.addEventListener("popstate", () => {
+            navPaths.push(location.pathname);
+        });
+        const originalPushState = history.pushState;
+        history.pushState = function (...args) {
+            originalPushState.apply(history, args);
+            navPaths.push(location.pathname);
+        };
+        const originalReplaceState = history.replaceState;
+        history.replaceState = function (...args) {
+            originalReplaceState.apply(history, args);
+            navPaths.push(location.pathname);
+        };
+        window.addEventListener("beforeunload", () => {
+            navPaths.forEach((e, i) => {
+                navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
+                    page: e,
+                    pageFrom: i > 0 ? navPaths[i - 1] : undefined,
+                    pageTo: navPaths[i + 1],
+                }));
+            });
+        });
     }
+    static scrollDepth() { }
 }
 //# sourceMappingURL=page_specific.js.map

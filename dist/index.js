@@ -10,4 +10,5 @@ loadSpeed();
 SessionManager.sessionCounter();
 SessionManager.sessionTimer();
 PageSpecific.pageLeft();
+PageSpecific.navPaths();
 //# sourceMappingURL=index.js.map
