@@ -1,4 +1,5 @@
 export declare class PageSpecific {
-    static pageSessionsTracker(): void;
+    static pageLeft(): void;
+    static visitsPerPage(): void;
 }
 //# sourceMappingURL=page_specific.d.ts.map

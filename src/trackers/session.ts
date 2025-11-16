@@ -1,6 +1,6 @@
 import { throttle } from "../reusables/throttle";
-let time = 2000;
-// let time = 60 * 60 * 1000;
+// let time = 2000;
+let time = 60 * 60 * 1000;
 function newSession() {
   console.log(
     "prev sess time:" +
@@ -10,7 +10,7 @@ function newSession() {
   localStorage.setItem("session-start-time", Date.now().toString());
 }
 
-export class sessionManager {
+export class SessionManager {
   static sessionCounter() {
     checkForNewSession();
     window.onclick = updateActivity;

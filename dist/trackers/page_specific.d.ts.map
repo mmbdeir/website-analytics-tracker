@@ -1,1 +1,1 @@
-{"version":3,"file":"page_specific.d.ts","sourceRoot":"","sources":["../../src/trackers/page_specific.ts"],"names":[],"mappings":"AAAA,qBAAa,YAAY;IAIvB,MAAM,CAAC,mBAAmB;CAO3B"}
+{"version":3,"file":"page_specific.d.ts","sourceRoot":"","sources":["../../src/trackers/page_specific.ts"],"names":[],"mappings":"AAAA,qBAAa,YAAY;IAIvB,MAAM,CAAC,QAAQ;IASf,MAAM,CAAC,aAAa;CAGrB"}

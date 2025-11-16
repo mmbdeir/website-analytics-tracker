@@ -1,4 +1,4 @@
-export declare class sessionManager {
+export declare class SessionManager {
     static sessionCounter(): void;
     static sessionTimer(): void;
 }
