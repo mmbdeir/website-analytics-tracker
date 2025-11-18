@@ -1,15 +1,15 @@
-import { trackButtons } from "./trackers/click";
-import { SessionManager } from "./trackers/session";
-import { loadSpeed } from "./trackers/performance";
-import { PageSpecific } from "./trackers/page_specific";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const click_1 = require("./trackers/click");
+const session_1 = require("./trackers/session");
+const performance_1 = require("./trackers/performance");
+const page_specific_1 = require("./trackers/page_specific");
 document.addEventListener("DOMContentLoaded", () => {
-    trackButtons();
+    (0, click_1.trackButtons)();
 });
 // Add screentime heatmap or analytics/statistics
-loadSpeed();
-SessionManager.sessionCounter();
+(0, performance_1.loadSpeed)();
+session_1.SessionManager.sessionCounter();
 // SessionManager.sessionTimer();
-PageSpecific.pageLeft();
-PageSpecific.navPaths();
-PageSpecific.scrollDepth();
+page_specific_1.PageSpecific.init();
 //# sourceMappingURL=index.js.map

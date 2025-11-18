@@ -1,10 +1,18 @@
-import { throttle } from "../reusables/throttle";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SessionManager = void 0;
+const throttle_1 = require("../reusables/throttle");
 // let time = 2000;
 let time = 60 * 60 * 1000;
 function newSession() {
-    localStorage.setItem("session-start-time", Date.now().toString());
+    try {
+        localStorage.setItem("session-start-time", Date.now().toString());
+    }
+    catch (e) {
+        console.log("Local storage doesnt work cuz: " + e);
+    }
 }
-export class SessionManager {
+class SessionManager {
     static sessionCounter() {
         checkForNewSession();
         window.addEventListener("click", updateActivity);
@@ -14,14 +22,20 @@ export class SessionManager {
         window.addEventListener("touchstart", updateActivity);
     }
 }
+exports.SessionManager = SessionManager;
 function checkForNewSession() {
-    let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
-    localStorage.setItem("at-last-active", Date.now().toString());
-    if (timeSinceLastUpdate > time) {
-        newSession();
+    try {
+        let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
+        localStorage.setItem("at-last-active", Date.now().toString());
+        if (timeSinceLastUpdate > time) {
+            newSession();
+        }
+    }
+    catch (e) {
+        console.log("Local storage doesnt work cuz: " + e);
     }
 }
-const updateActivity = throttle(() => {
+const updateActivity = (0, throttle_1.throttle)(() => {
     checkForNewSession();
 }, 1500);
 //# sourceMappingURL=session.js.map

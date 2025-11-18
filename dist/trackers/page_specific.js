@@ -1,31 +1,42 @@
-export class PageSpecific {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PageSpecific = void 0;
+require("scrollyfills");
+class PageSpecific {
+    static init() {
+        this.initNavPaths();
+        this.initScrollDepth();
+        this.initPageLeft();
+    }
     // Amount of sessions per page
     // - on page open(not reload) a new page session with the pages name from the metadata, and its url
     // From what page this user came from to get to this page
-    static pageLeft() {
+    static initPageLeft() {
         document.addEventListener("beforeunload", (e) => {
-            e.preventDefault();
-            navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({ pageLeft: window.location.pathname }));
+            navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
+                pageLeft: window.location.pathname,
+                // duration: get session duration
+            }));
         });
     }
     // Track what page the user came from and where did he go after
-    static navPaths() {
+    static initNavPaths() {
         const navPaths = [location.pathname];
-        window.addEventListener("popstate", () => {
+        const pushNavPaths = () => {
             navPaths.push(location.pathname);
-        });
+        };
+        window.addEventListener("popstate", pushNavPaths);
         const originalPushState = history.pushState;
         history.pushState = function (...args) {
             originalPushState.apply(history, args);
-            navPaths.push(location.pathname);
+            pushNavPaths();
         };
         const originalReplaceState = history.replaceState;
         history.replaceState = function (...args) {
             originalReplaceState.apply(history, args);
-            navPaths.push(location.pathname);
+            pushNavPaths();
         };
         window.addEventListener("beforeunload", (e) => {
-            e.preventDefault();
             navPaths.forEach((e, i) => {
                 navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
                     page: e,
@@ -35,7 +46,7 @@ export class PageSpecific {
             });
         });
     }
-    static scrollDepth() {
+    static initScrollDepth() {
         let maxDepth = 0;
         let clientHeight = document.documentElement.clientHeight;
         function getScrollDepthPercent() {
@@ -53,8 +64,9 @@ export class PageSpecific {
             }
         });
         window.addEventListener("beforeunload", () => {
-            // send maxDepth to the server
+            navigator.sendBeacon("Use some url to host the function", JSON.stringify({ scrollDepth: maxDepth }));
         });
     }
 }
+exports.PageSpecific = PageSpecific;
 //# sourceMappingURL=page_specific.js.map

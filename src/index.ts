@@ -11,6 +11,4 @@ document.addEventListener("DOMContentLoaded", () => {
 loadSpeed();
 SessionManager.sessionCounter();
 // SessionManager.sessionTimer();
-PageSpecific.pageLeft();
-PageSpecific.navPaths();
-PageSpecific.scrollDepth();
+PageSpecific.init();
