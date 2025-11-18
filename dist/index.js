@@ -11,5 +11,4 @@ document.addEventListener("DOMContentLoaded", () => {
 (0, performance_1.loadSpeed)();
 session_1.SessionManager.init();
 page_specific_1.PageSpecific.init();
-// SessionManager.sessionTimer();
 //# sourceMappingURL=index.js.map

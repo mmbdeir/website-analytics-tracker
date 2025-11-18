@@ -47,12 +47,10 @@
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.SessionManager = void 0;
       var throttle_1 = require_throttle();
-      var SESSION_TIMEOUT_MS = 30 * 60 * 1e3;
+      var SESSION_TIMEOUT_MS = 3 * 60 * 1e3;
       var LAST_ACTIVE_KEY = "at-last-active";
-      var SESSION_START_KEY = "session-start-time";
       function newSession() {
         try {
-          localStorage.setItem(SESSION_START_KEY, Date.now().toString());
         } catch (error) {
           console.log("Local storage doesnt work cuz: " + error);
         }
@@ -198,11 +196,13 @@
         // - on page open(not reload) a new page session with the pages name from the metadata, and its url
         // From what page this user came from to get to this page
         static initPageLeft() {
-          document.addEventListener("beforeunload", (e) => {
-            navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
-              pageLeft: window.location.pathname
-              // duration: get session duration
-            }));
+          document.addEventListener("visibilitychange", (e) => {
+            if (document.visibilityState === "hidden") {
+              navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
+                pageLeft: window.location.pathname
+                // duration: get session duration
+              }));
+            }
           });
         }
         // Track what page the user came from and where did he go after

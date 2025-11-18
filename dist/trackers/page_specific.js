@@ -16,11 +16,13 @@ class PageSpecific {
     // - on page open(not reload) a new page session with the pages name from the metadata, and its url
     // From what page this user came from to get to this page
     static initPageLeft() {
-        document.addEventListener("beforeunload", (e) => {
-            navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
-                pageLeft: window.location.pathname,
-                // duration: get session duration
-            }));
+        document.addEventListener("visibilitychange", (e) => {
+            if (document.visibilityState === "hidden") {
+                navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
+                    pageLeft: window.location.pathname,
+                    // duration: get session duration
+                }));
+            }
         });
     }
     // Track what page the user came from and where did he go after

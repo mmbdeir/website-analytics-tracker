@@ -11,4 +11,3 @@ document.addEventListener("DOMContentLoaded", () => {
 loadSpeed();
 SessionManager.init();
 PageSpecific.init();
-// SessionManager.sessionTimer();

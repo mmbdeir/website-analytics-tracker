@@ -2,12 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionManager = void 0;
 const throttle_1 = require("../reusables/throttle");
-const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 1 hour
+const SESSION_TIMEOUT_MS = 3 * 60 * 1000;
 const LAST_ACTIVE_KEY = "at-last-active";
-const SESSION_START_KEY = "session-start-time";
 function newSession() {
     try {
-        localStorage.setItem(SESSION_START_KEY, Date.now().toString());
+        // navigator.sendBeacon()
     }
     catch (error) {
         console.log("Local storage doesnt work cuz: " + error);
@@ -21,16 +20,9 @@ class SessionManager {
         this.initilized = true;
         checkForNewSession();
         checkForActivity();
-        // sessionTimer();
     }
 }
 exports.SessionManager = SessionManager;
-// static sessionTimer() {
-//   let sessionStartTime = localStorage.getItem(SESSION_START_KEY);
-//   if (!sessionStartTime) {
-//     localStorage.setItem("session-start-time", Date.now().toString());
-//   }
-// }
 function checkForActivity() {
     window.addEventListener("click", updateActivity);
     window.addEventListener("scroll", updateActivity);
