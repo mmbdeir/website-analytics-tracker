@@ -9,6 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Add screentime heatmap or analytics/statistics
 loadSpeed();
-SessionManager.sessionCounter();
-// SessionManager.sessionTimer();
+SessionManager.init();
 PageSpecific.init();
+// SessionManager.sessionTimer();

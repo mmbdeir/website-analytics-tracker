@@ -1,4 +1,5 @@
 export declare class SessionManager {
-    static sessionCounter(): void;
+    private static initilized;
+    static init(): void;
 }
 //# sourceMappingURL=session.d.ts.map

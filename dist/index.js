@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 // Add screentime heatmap or analytics/statistics
 (0, performance_1.loadSpeed)();
-session_1.SessionManager.sessionCounter();
-// SessionManager.sessionTimer();
+session_1.SessionManager.init();
 page_specific_1.PageSpecific.init();
+// SessionManager.sessionTimer();
 //# sourceMappingURL=index.js.map

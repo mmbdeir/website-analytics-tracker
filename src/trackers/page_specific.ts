@@ -1,7 +1,10 @@
 import "scrollyfills";
 
 export class PageSpecific {
+  private static initilized = false;
   static init() {
+    if (this.initilized) return;
+    this.initilized = true;
     this.initNavPaths();
     this.initScrollDepth();
     this.initPageLeft();
@@ -10,22 +13,24 @@ export class PageSpecific {
   // - on page open(not reload) a new page session with the pages name from the metadata, and its url
   // From what page this user came from to get to this page
   static initPageLeft(): void {
-    document.addEventListener("beforeunload", (e) => {
-      navigator.sendBeacon(
-        "Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes",
-        JSON.stringify({
-          pageLeft: window.location.pathname,
-          // duration: get session duration
-        })
-      );
+    document.addEventListener("visibilitychange", (e) => {
+      if (document.visibilityState === "hidden") {
+        navigator.sendBeacon(
+          "Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes",
+          JSON.stringify({
+            pageLeft: window.location.pathname,
+            // duration: get session duration
+          })
+        );
+      }
     });
   }
   // Track what page the user came from and where did he go after
 
   private static initNavPaths(): void {
-    const navPaths = [location.pathname];
+    const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
-      navPaths.push(location.pathname);
+      navPaths.push(window.location.pathname);
     };
 
     window.addEventListener("popstate", pushNavPaths);
@@ -42,17 +47,15 @@ export class PageSpecific {
       pushNavPaths();
     };
 
-    window.addEventListener("beforeunload", (e) => {
-      navPaths.forEach((e, i) => {
+    window.addEventListener("beforeunload", () => {
+      try {
         navigator.sendBeacon(
           "Maybe not cloud run, if fire/supabase lets me use a url then do it",
           JSON.stringify({
-            page: e,
-            pageFrom: i > 0 ? navPaths[i - 1] : undefined,
-            pageTo: navPaths[i + 1],
+            paths: navPaths,
           })
         );
-      });
+      } catch (error) {}
     });
   }
 

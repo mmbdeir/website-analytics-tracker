@@ -3,7 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PageSpecific = void 0;
 require("scrollyfills");
 class PageSpecific {
+    static initilized = false;
     static init() {
+        if (this.initilized)
+            return;
+        this.initilized = true;
         this.initNavPaths();
         this.initScrollDepth();
         this.initPageLeft();
@@ -21,9 +25,9 @@ class PageSpecific {
     }
     // Track what page the user came from and where did he go after
     static initNavPaths() {
-        const navPaths = [location.pathname];
+        const navPaths = [window.location.pathname];
         const pushNavPaths = () => {
-            navPaths.push(location.pathname);
+            navPaths.push(window.location.pathname);
         };
         window.addEventListener("popstate", pushNavPaths);
         const originalPushState = history.pushState;
@@ -36,14 +40,13 @@ class PageSpecific {
             originalReplaceState.apply(history, args);
             pushNavPaths();
         };
-        window.addEventListener("beforeunload", (e) => {
-            navPaths.forEach((e, i) => {
+        window.addEventListener("beforeunload", () => {
+            try {
                 navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
-                    page: e,
-                    pageFrom: i > 0 ? navPaths[i - 1] : undefined,
-                    pageTo: navPaths[i + 1],
+                    paths: navPaths,
                 }));
-            });
+            }
+            catch (error) { }
         });
     }
     static initScrollDepth() {

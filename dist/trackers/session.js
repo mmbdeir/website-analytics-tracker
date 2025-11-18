@@ -2,32 +2,47 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionManager = void 0;
 const throttle_1 = require("../reusables/throttle");
-// let time = 2000;
-let time = 60 * 60 * 1000;
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 1 hour
+const LAST_ACTIVE_KEY = "at-last-active";
+const SESSION_START_KEY = "session-start-time";
 function newSession() {
     try {
-        localStorage.setItem("session-start-time", Date.now().toString());
+        localStorage.setItem(SESSION_START_KEY, Date.now().toString());
     }
-    catch (e) {
-        console.log("Local storage doesnt work cuz: " + e);
+    catch (error) {
+        console.log("Local storage doesnt work cuz: " + error);
     }
 }
 class SessionManager {
-    static sessionCounter() {
+    static initilized = false;
+    static init() {
+        if (this.initilized)
+            return;
+        this.initilized = true;
         checkForNewSession();
-        window.addEventListener("click", updateActivity);
-        window.addEventListener("scroll", updateActivity);
-        window.addEventListener("keydown", updateActivity);
-        window.addEventListener("mousemove", updateActivity);
-        window.addEventListener("touchstart", updateActivity);
+        checkForActivity();
+        // sessionTimer();
     }
 }
 exports.SessionManager = SessionManager;
+// static sessionTimer() {
+//   let sessionStartTime = localStorage.getItem(SESSION_START_KEY);
+//   if (!sessionStartTime) {
+//     localStorage.setItem("session-start-time", Date.now().toString());
+//   }
+// }
+function checkForActivity() {
+    window.addEventListener("click", updateActivity);
+    window.addEventListener("scroll", updateActivity);
+    window.addEventListener("keydown", updateActivity);
+    window.addEventListener("mousemove", updateActivity);
+    window.addEventListener("touchstart", updateActivity);
+}
 function checkForNewSession() {
     try {
-        let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
-        localStorage.setItem("at-last-active", Date.now().toString());
-        if (timeSinceLastUpdate > time) {
+        let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem(LAST_ACTIVE_KEY) || 0);
+        localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+        if (timeSinceLastUpdate > SESSION_TIMEOUT_MS) {
             newSession();
         }
     }

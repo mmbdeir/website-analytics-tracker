@@ -47,30 +47,39 @@
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.SessionManager = void 0;
       var throttle_1 = require_throttle();
-      var time = 60 * 60 * 1e3;
+      var SESSION_TIMEOUT_MS = 30 * 60 * 1e3;
+      var LAST_ACTIVE_KEY = "at-last-active";
+      var SESSION_START_KEY = "session-start-time";
       function newSession() {
         try {
-          localStorage.setItem("session-start-time", Date.now().toString());
-        } catch (e) {
-          console.log("Local storage doesnt work cuz: " + e);
+          localStorage.setItem(SESSION_START_KEY, Date.now().toString());
+        } catch (error) {
+          console.log("Local storage doesnt work cuz: " + error);
         }
       }
       var SessionManager = class {
-        static sessionCounter() {
+        static initilized = false;
+        static init() {
+          if (this.initilized)
+            return;
+          this.initilized = true;
           checkForNewSession();
-          window.addEventListener("click", updateActivity);
-          window.addEventListener("scroll", updateActivity);
-          window.addEventListener("keydown", updateActivity);
-          window.addEventListener("mousemove", updateActivity);
-          window.addEventListener("touchstart", updateActivity);
+          checkForActivity();
         }
       };
       exports.SessionManager = SessionManager;
+      function checkForActivity() {
+        window.addEventListener("click", updateActivity);
+        window.addEventListener("scroll", updateActivity);
+        window.addEventListener("keydown", updateActivity);
+        window.addEventListener("mousemove", updateActivity);
+        window.addEventListener("touchstart", updateActivity);
+      }
       function checkForNewSession() {
         try {
-          let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem("at-last-active") || 0);
-          localStorage.setItem("at-last-active", Date.now().toString());
-          if (timeSinceLastUpdate > time) {
+          let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem(LAST_ACTIVE_KEY) || 0);
+          localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+          if (timeSinceLastUpdate > SESSION_TIMEOUT_MS) {
             newSession();
           }
         } catch (e) {
@@ -176,7 +185,11 @@
       exports.PageSpecific = void 0;
       require_scrollyfills();
       var PageSpecific = class {
+        static initilized = false;
         static init() {
+          if (this.initilized)
+            return;
+          this.initilized = true;
           this.initNavPaths();
           this.initScrollDepth();
           this.initPageLeft();
@@ -194,9 +207,9 @@
         }
         // Track what page the user came from and where did he go after
         static initNavPaths() {
-          const navPaths = [location.pathname];
+          const navPaths = [window.location.pathname];
           const pushNavPaths = () => {
-            navPaths.push(location.pathname);
+            navPaths.push(window.location.pathname);
           };
           window.addEventListener("popstate", pushNavPaths);
           const originalPushState = history.pushState;
@@ -209,14 +222,13 @@
             originalReplaceState.apply(history, args);
             pushNavPaths();
           };
-          window.addEventListener("beforeunload", (e) => {
-            navPaths.forEach((e2, i) => {
+          window.addEventListener("beforeunload", () => {
+            try {
               navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
-                page: e2,
-                pageFrom: i > 0 ? navPaths[i - 1] : void 0,
-                pageTo: navPaths[i + 1]
+                paths: navPaths
               }));
-            });
+            } catch (error) {
+            }
           });
         }
         static initScrollDepth() {
@@ -257,7 +269,7 @@
         (0, click_1.trackButtons)();
       });
       (0, performance_1.loadSpeed)();
-      session_1.SessionManager.sessionCounter();
+      session_1.SessionManager.init();
       page_specific_1.PageSpecific.init();
     }
   });
