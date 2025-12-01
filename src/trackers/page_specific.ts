@@ -14,6 +14,7 @@ export class PageSpecific {
 
     this.getMaxScrollDepth = this.initScrollDepth();
     this.initVisibilityHandler();
+    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   }
   // Amount of sessions per page
   // - on page open(not reload) a new page session with the pages name from the metadata, and its url
@@ -28,7 +29,6 @@ export class PageSpecific {
     });
   }
 
-  // Track what page the user came from and where did he go after
   private static initNavPaths(): string[] {
     const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
@@ -61,7 +61,7 @@ export class PageSpecific {
     window.addEventListener("resize", () => {
       clientHeight = document.documentElement.clientHeight;
     });
-    return () => maxDepth;
+    return Math.min(100, maxDepth);
   }
 }
 
@@ -81,15 +81,15 @@ function navigationChange(callback: () => void) {
   const originalPushState = history.pushState;
   history.pushState = function (...args) {
     originalPushState.apply(history, args);
-    sendPageMetric();
     callback();
+    sendPageMetric();
   };
 
   const originalReplaceState = history.replaceState;
   history.replaceState = function (...args) {
     originalReplaceState.apply(history, args);
-    sendPageMetric();
     callback();
+    sendPageMetric();
   };
 }
 
