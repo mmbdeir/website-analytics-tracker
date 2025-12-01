@@ -182,6 +182,7 @@
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PageSpecific = void 0;
       require_scrollyfills();
+      var SESSION_START_TIME = "session_start_time";
       var PageSpecific = class {
         static initilized = false;
         static init() {
@@ -191,6 +192,7 @@
           this.initNavPaths();
           this.initScrollDepth();
           this.initPageLeft();
+          this.timePerPage();
         }
         // Amount of sessions per page
         // - on page open(not reload) a new page session with the pages name from the metadata, and its url
@@ -205,29 +207,24 @@
             }
           });
         }
+        static timePerPage() {
+          localStorage.setItem(SESSION_START_TIME, Date.now().toString());
+        }
         // Track what page the user came from and where did he go after
         static initNavPaths() {
           const navPaths = [window.location.pathname];
           const pushNavPaths = () => {
             navPaths.push(window.location.pathname);
           };
-          window.addEventListener("popstate", pushNavPaths);
-          const originalPushState = history.pushState;
-          history.pushState = function(...args) {
-            originalPushState.apply(history, args);
-            pushNavPaths();
-          };
-          const originalReplaceState = history.replaceState;
-          history.replaceState = function(...args) {
-            originalReplaceState.apply(history, args);
-            pushNavPaths();
-          };
-          window.addEventListener("beforeunload", () => {
-            try {
-              navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
-                paths: navPaths
-              }));
-            } catch (error) {
+          navigationChange(pushNavPaths);
+          window.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
+              try {
+                navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
+                  paths: navPaths
+                }));
+              } catch (error) {
+              }
             }
           });
         }
@@ -254,6 +251,19 @@
         }
       };
       exports.PageSpecific = PageSpecific;
+      function navigationChange(callback) {
+        window.addEventListener("popstate", callback);
+        const originalPushState = history.pushState;
+        history.pushState = function(...args) {
+          originalPushState.apply(history, args);
+          callback();
+        };
+        const originalReplaceState = history.replaceState;
+        history.replaceState = function(...args) {
+          originalReplaceState.apply(history, args);
+          callback();
+        };
+      }
     }
   });
 

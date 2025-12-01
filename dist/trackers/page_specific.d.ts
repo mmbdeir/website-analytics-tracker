@@ -2,8 +2,9 @@ import "scrollyfills";
 export declare class PageSpecific {
     private static initilized;
     static init(): void;
-    static initPageLeft(): void;
+    private static initPageLeft;
+    private static timePerPage;
     private static initNavPaths;
-    static initScrollDepth(): void;
+    private static initScrollDepth;
 }
 //# sourceMappingURL=page_specific.d.ts.map

@@ -1,67 +1,71 @@
 import "scrollyfills";
 
+const CURRENT_SESSION_START_TIME = "current_session_start_time";
+
 export class PageSpecific {
   private static initilized = false;
   static init() {
     if (this.initilized) return;
     this.initilized = true;
-    this.initNavPaths();
-    this.initScrollDepth();
-    this.initPageLeft();
+    const navPaths = this.initNavPaths();
+    const getMaxDepth = this.initScrollDepth();
+    this.initVisibilityHandler(navPaths, getMaxDepth);
+    this.timePerPage();
   }
   // Amount of sessions per page
   // - on page open(not reload) a new page session with the pages name from the metadata, and its url
   // From what page this user came from to get to this page
-  static initPageLeft(): void {
+  private static initVisibilityHandler(
+    navPaths: string[],
+    getMaxScrollDepth: () => number
+  ) {
     document.addEventListener("visibilitychange", (e) => {
       if (document.visibilityState === "hidden") {
+        const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
+        const duration = Date.now() - start;
         navigator.sendBeacon(
           "Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes",
           JSON.stringify({
             pageLeft: window.location.pathname,
-            // duration: get session duration
           })
+        );
+        navigator.sendBeacon(
+          "end point",
+          JSON.stringify({ duration: duration })
+        );
+        navigator.sendBeacon(
+          "endpoint",
+          JSON.stringify({ navPaths: navPaths })
+        );
+        navigator.sendBeacon(
+          "endpoint",
+          JSON.stringify({ scrollDepth: getMaxScrollDepth() })
         );
       }
     });
   }
+
+  private static timePerPage() {
+    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+  }
+
   // Track what page the user came from and where did he go after
 
-  private static initNavPaths(): void {
+  private static initNavPaths(): string[] {
     const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
       navPaths.push(window.location.pathname);
     };
 
-    window.addEventListener("popstate", pushNavPaths);
+    navigationChange(pushNavPaths);
 
-    const originalPushState = history.pushState;
-    history.pushState = function (...args) {
-      originalPushState.apply(history, args);
-      pushNavPaths();
-    };
-
-    const originalReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-      originalReplaceState.apply(history, args);
-      pushNavPaths();
-    };
-
-    window.addEventListener("beforeunload", () => {
-      try {
-        navigator.sendBeacon(
-          "Maybe not cloud run, if fire/supabase lets me use a url then do it",
-          JSON.stringify({
-            paths: navPaths,
-          })
-        );
-      } catch (error) {}
-    });
+    return navPaths;
   }
 
-  static initScrollDepth() {
+  private static initScrollDepth() {
     let maxDepth: number = 0;
     let clientHeight = document.documentElement.clientHeight;
+
     function getScrollDepthPercent() {
       let scrollHeight = document.documentElement.scrollHeight;
       const maxScroll = scrollHeight - clientHeight;
@@ -76,11 +80,22 @@ export class PageSpecific {
         maxDepth = currentDepth;
       }
     });
-    window.addEventListener("beforeunload", () => {
-      navigator.sendBeacon(
-        "Use some url to host the function",
-        JSON.stringify({ scrollDepth: maxDepth })
-      );
-    });
+    return () => maxDepth;
   }
+}
+
+function navigationChange(callback: () => void) {
+  window.addEventListener("popstate", callback);
+
+  const originalPushState = history.pushState;
+  history.pushState = function (...args) {
+    originalPushState.apply(history, args);
+    callback();
+  };
+
+  const originalReplaceState = history.replaceState;
+  history.replaceState = function (...args) {
+    originalReplaceState.apply(history, args);
+    callback();
+  };
 }
