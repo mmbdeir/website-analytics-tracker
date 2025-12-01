@@ -5,34 +5,27 @@ const CURRENT_SESSION_START_TIME = "current_session_start_time";
 export class PageSpecific {
   private static initialized = false;
   private static navPaths: string[] = [];
-  static getMaxScrollDepth: () => number;
+  static getMaxScrollDepth: () => number = () => 0;
 
   static init() {
     if (this.initialized) return;
     this.initialized = true;
-    this.getMaxScrollDepth = this.initScrollDepth();
     this.navPaths = this.initNavPaths();
-    this.initVisibilityHandler(this.getMaxScrollDepth);
+
+    this.getMaxScrollDepth = this.initScrollDepth();
+    this.initVisibilityHandler();
   }
   // Amount of sessions per page
   // - on page open(not reload) a new page session with the pages name from the metadata, and its url
   // From what page this user came from to get to this page
-  private static initVisibilityHandler(getMaxScrollDepth: () => number) {
+  private static initVisibilityHandler() {
     document.addEventListener("visibilitychange", (e) => {
       if (document.visibilityState !== "hidden") return;
-      const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
-      const duration = Date.now() - start;
-      navigator.sendBeacon(
-        "end point",
-        JSON.stringify({
-          pageDuration: duration,
-          navPaths: this.navPaths,
-          pageLeft: window.location.pathname,
-          scrollDepth: getMaxScrollDepth(),
-        })
-      );
+      sendPageMetric({
+        navPaths: this.navPaths,
+        pageLeft: window.location.pathname,
+      });
     });
-    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   }
 
   // Track what page the user came from and where did he go after
@@ -72,31 +65,37 @@ export class PageSpecific {
   }
 }
 
-function navigationChange(callback: () => void) {
-  const run = () => {
-    const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
-    const duration = Date.now() - start;
-    navigator.sendBeacon(
-      "ENDPOINT",
-      JSON.stringify({
-        pageDuration: duration,
-        scrollDetph: PageSpecific.getMaxScrollDepth(),
-      })
-    );
-    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
-  };
+function sendPageMetric(extra: Record<string, any> = {}) {
+  const nav = onNavigation();
+  navigator.sendBeacon(
+    "ENDPOINT",
+    JSON.stringify({
+      pageDuration: nav,
+      scrollDepth: PageSpecific.getMaxScrollDepth(),
+      ...extra,
+    })
+  );
+}
 
+function navigationChange(callback: () => void) {
   const originalPushState = history.pushState;
   history.pushState = function (...args) {
     originalPushState.apply(history, args);
-    run();
+    sendPageMetric();
     callback();
   };
 
   const originalReplaceState = history.replaceState;
   history.replaceState = function (...args) {
     originalReplaceState.apply(history, args);
-    run();
+    sendPageMetric();
     callback();
   };
+}
+
+function onNavigation() {
+  const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
+  const duration = Date.now() - start;
+  localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+  return duration;
 }
