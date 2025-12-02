@@ -1,10 +1,19 @@
 import "scrollyfills";
 export declare class PageSpecific {
-    private static initilized;
+    private static navPaths;
+    static getMaxScrollDepth: () => number;
     static init(): void;
-    private static initPageLeft;
-    private static timePerPage;
+    /** -------------------------
+     *  EXIT PAGE FUNCTION
+     * ------------------------- */
+    private static OnPageExist;
+    /** -------------------------
+     *  NAV PATH TRACKING
+     * ------------------------- */
     private static initNavPaths;
-    private static initScrollDepth;
+    /** -------------------------
+     *  SCROLL DEPTH TRACKING
+     * ------------------------- */
+    static initScrollDepth(): () => number;
 }
 //# sourceMappingURL=page_specific.d.ts.map

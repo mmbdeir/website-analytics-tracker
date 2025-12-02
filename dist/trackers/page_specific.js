@@ -2,52 +2,45 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PageSpecific = void 0;
 require("scrollyfills");
-const SESSION_START_TIME = "session_start_time";
+const CURRENT_SESSION_START_TIME = "current_session_start_time";
 class PageSpecific {
-    static initilized = false;
+    static navPaths = [];
+    static getMaxScrollDepth = () => 0;
     static init() {
-        if (this.initilized)
-            return;
-        this.initilized = true;
-        this.initNavPaths();
-        this.initScrollDepth();
-        this.initPageLeft();
-        this.timePerPage();
+        this.navPaths = this.initNavPaths();
+        this.getMaxScrollDepth = this.initScrollDepth();
+        this.OnPageExist();
+        localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
     }
-    // Amount of sessions per page
-    // - on page open(not reload) a new page session with the pages name from the metadata, and its url
-    // From what page this user came from to get to this page
-    static initPageLeft() {
-        document.addEventListener("visibilitychange", (e) => {
-            if (document.visibilityState === "hidden") {
-                navigator.sendBeacon("Use cloud run url to host the function, im using sendBeacon so it still runs if the tab closes", JSON.stringify({
-                    pageLeft: window.location.pathname,
-                    // duration: get session duration
-                }));
-            }
+    /** -------------------------
+     *  EXIT PAGE FUNCTION
+     * ------------------------- */
+    static OnPageExist() {
+        // A SESSION SHOULD BE ON EVERY INVISIBILITY CHANGE IF ITS ON MOBILE. IF ITS ON PC THEN USE BEFORE UNLOAD
+        document.addEventListener("beforeunload", (e) => {
+            sendPageMetric({
+                navPaths: this.navPaths,
+                pageLeft: window.location.pathname,
+            });
+            console.log("Page Left: " + window.localStorage.pathname);
         });
     }
-    static timePerPage() {
-        localStorage.setItem(SESSION_START_TIME, Date.now().toString());
-    }
-    // Track what page the user came from and where did he go after
+    /** -------------------------
+     *  NAV PATH TRACKING
+     * ------------------------- */
     static initNavPaths() {
+        // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
         const navPaths = [window.location.pathname];
         const pushNavPaths = () => {
             navPaths.push(window.location.pathname);
+            console.log("Nav paths: " + navPaths);
         };
-        navigationChange(pushNavPaths);
-        window.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "hidden") {
-                try {
-                    navigator.sendBeacon("Maybe not cloud run, if fire/supabase lets me use a url then do it", JSON.stringify({
-                        paths: navPaths,
-                    }));
-                }
-                catch (error) { }
-            }
-        });
+        onNavigation(pushNavPaths);
+        return navPaths;
     }
+    /** -------------------------
+     *  SCROLL DEPTH TRACKING
+     * ------------------------- */
     static initScrollDepth() {
         let maxDepth = 0;
         let clientHeight = document.documentElement.clientHeight;
@@ -65,23 +58,53 @@ class PageSpecific {
                 maxDepth = currentDepth;
             }
         });
-        window.addEventListener("beforeunload", () => {
-            navigator.sendBeacon("Use some url to host the function", JSON.stringify({ scrollDepth: maxDepth }));
+        window.addEventListener("resize", () => {
+            clientHeight = document.documentElement.clientHeight;
         });
+        return () => Math.round(Math.min(100, maxDepth));
     }
 }
 exports.PageSpecific = PageSpecific;
-function navigationChange(callback) {
-    window.addEventListener("popstate", callback);
+/** -------------------------
+ *  SEND DATA TO SERVER
+ * ------------------------- */
+function sendPageMetric(extra = {}) {
+    const duration = sessionDurationTimer();
+    navigator.sendBeacon("ENDPOINT", JSON.stringify({
+        page: window.location.pathname,
+        pageDuration: duration,
+        scrollDepth: PageSpecific.getMaxScrollDepth(),
+        ...extra,
+    }));
+    console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
+}
+/** -------------------------
+ *  ON NAVIGATION
+ * ------------------------- */
+function onNavigation(callback) {
     const originalPushState = history.pushState;
     history.pushState = function (...args) {
         originalPushState.apply(history, args);
         callback();
+        sendPageMetric();
+        PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
     };
     const originalReplaceState = history.replaceState;
     history.replaceState = function (...args) {
         originalReplaceState.apply(history, args);
         callback();
+        sendPageMetric();
+        PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
     };
+}
+/** -------------------------
+ *  SESSION DURATION TIMER
+ * ------------------------- */
+function sessionDurationTimer() {
+    const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
+    const duration = Date.now() - start;
+    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+    console.log("Previous page duration: " + duration);
+    return duration;
 }
 //# sourceMappingURL=page_specific.js.map

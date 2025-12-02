@@ -3,25 +3,22 @@ import "scrollyfills";
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
 
 export class PageSpecific {
-  private static initialized = false;
   private static navPaths: string[] = [];
   static getMaxScrollDepth: () => number = () => 0;
 
   static init() {
-    if (this.initialized) return;
-    this.initialized = true;
     this.navPaths = this.initNavPaths();
-
     this.getMaxScrollDepth = this.initScrollDepth();
-    this.initVisibilityHandler();
+    this.OnPageExist();
     localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   }
-  // Amount of sessions per page
-  // - on page open(not reload) a new page session with the pages name from the metadata, and its url
-  // From what page this user came from to get to this page
-  private static initVisibilityHandler() {
-    document.addEventListener("visibilitychange", (e) => {
-      if (document.visibilityState !== "hidden") return;
+
+  /** -------------------------
+   *  EXIT PAGE FUNCTION
+   * ------------------------- */
+  private static OnPageExist() {
+    // A SESSION SHOULD BE ON EVERY INVISIBILITY CHANGE IF ITS ON MOBILE. IF ITS ON PC THEN USE BEFORE UNLOAD
+    document.addEventListener("beforeunload", (e) => {
       sendPageMetric({
         navPaths: this.navPaths,
         pageLeft: window.location.pathname,
@@ -30,18 +27,25 @@ export class PageSpecific {
     });
   }
 
+  /** -------------------------
+   *  NAV PATH TRACKING
+   * ------------------------- */
   private static initNavPaths(): string[] {
+    // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
     const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
       navPaths.push(window.location.pathname);
       console.log("Nav paths: " + navPaths);
     };
 
-    navigationChange(pushNavPaths);
+    onNavigation(pushNavPaths);
     return navPaths;
   }
 
-  private static initScrollDepth() {
+  /** -------------------------
+   *  SCROLL DEPTH TRACKING
+   * ------------------------- */
+  static initScrollDepth() {
     let maxDepth: number = 0;
     let clientHeight = document.documentElement.clientHeight;
 
@@ -62,29 +66,37 @@ export class PageSpecific {
     window.addEventListener("resize", () => {
       clientHeight = document.documentElement.clientHeight;
     });
-    console.log("maxDepth: " + maxDepth);
-    return () => Math.min(100, maxDepth);
+    return () => Math.round(Math.min(100, maxDepth));
   }
 }
 
+/** -------------------------
+ *  SEND DATA TO SERVER
+ * ------------------------- */
 function sendPageMetric(extra: Record<string, any> = {}) {
-  const duration = onNavigation();
+  const duration = sessionDurationTimer();
   navigator.sendBeacon(
     "ENDPOINT",
     JSON.stringify({
+      page: window.location.pathname,
       pageDuration: duration,
       scrollDepth: PageSpecific.getMaxScrollDepth(),
       ...extra,
     })
   );
+  console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
 }
 
-function navigationChange(callback: () => void) {
+/** -------------------------
+ *  ON NAVIGATION
+ * ------------------------- */
+function onNavigation(callback: () => void) {
   const originalPushState = history.pushState;
   history.pushState = function (...args) {
     originalPushState.apply(history, args);
     callback();
     sendPageMetric();
+    PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
   };
 
   const originalReplaceState = history.replaceState;
@@ -92,10 +104,14 @@ function navigationChange(callback: () => void) {
     originalReplaceState.apply(history, args);
     callback();
     sendPageMetric();
+    PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
   };
 }
 
-function onNavigation() {
+/** -------------------------
+ *  SESSION DURATION TIMER
+ * ------------------------- */
+function sessionDurationTimer() {
   const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
   const duration = Date.now() - start;
   localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
