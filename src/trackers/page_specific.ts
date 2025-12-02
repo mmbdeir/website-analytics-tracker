@@ -26,6 +26,7 @@ export class PageSpecific {
         navPaths: this.navPaths,
         pageLeft: window.location.pathname,
       });
+      console.log("Page Left: " + window.localStorage.pathname);
     });
   }
 
@@ -33,10 +34,10 @@ export class PageSpecific {
     const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
       navPaths.push(window.location.pathname);
+      console.log("Nav paths: " + navPaths);
     };
 
     navigationChange(pushNavPaths);
-
     return navPaths;
   }
 
@@ -61,16 +62,17 @@ export class PageSpecific {
     window.addEventListener("resize", () => {
       clientHeight = document.documentElement.clientHeight;
     });
-    return Math.min(100, maxDepth);
+    console.log("maxDepth: " + maxDepth);
+    return () => Math.min(100, maxDepth);
   }
 }
 
 function sendPageMetric(extra: Record<string, any> = {}) {
-  const nav = onNavigation();
+  const duration = onNavigation();
   navigator.sendBeacon(
     "ENDPOINT",
     JSON.stringify({
-      pageDuration: nav,
+      pageDuration: duration,
       scrollDepth: PageSpecific.getMaxScrollDepth(),
       ...extra,
     })
@@ -97,5 +99,6 @@ function onNavigation() {
   const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
   const duration = Date.now() - start;
   localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+  console.log("Previous page duration: " + duration);
   return duration;
 }
