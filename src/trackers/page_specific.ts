@@ -7,39 +7,50 @@ export class PageSpecific {
   static getMaxScrollDepth: () => number = () => 0;
 
   static init() {
-    this.navPaths = this.initNavPaths();
+    this.navPaths = [window.location.pathname];
+    this.initNavPaths();
     this.getMaxScrollDepth = this.initScrollDepth();
-    this.OnPageExist();
+    this.OnPageExit();
     localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   }
 
   /** -------------------------
    *  EXIT PAGE FUNCTION
    * ------------------------- */
-  private static OnPageExist() {
+  private static OnPageExit() {
     // A SESSION SHOULD BE ON EVERY INVISIBILITY CHANGE IF ITS ON MOBILE. IF ITS ON PC THEN USE BEFORE UNLOAD
-    document.addEventListener("beforeunload", (e) => {
-      sendPageMetric({
-        navPaths: this.navPaths,
-        pageLeft: window.location.pathname,
+    if (isMobileBrowser()) {
+      document.addEventListener("visibilitychange", (e) => {
+        if (document.visibilityState === "hidden") {
+          sendPageMetric({
+            navPaths: this.navPaths,
+            pageLeft: window.location.pathname,
+          });
+          console.log("Page Left: " + window.localStorage.pathname);
+        }
       });
-      console.log("Page Left: " + window.localStorage.pathname);
-    });
+    } else {
+      document.addEventListener("beforeunload", (e) => {
+        sendPageMetric({
+          navPaths: this.navPaths,
+          pageLeft: window.location.pathname,
+        });
+        console.log("Page Left: " + window.localStorage.pathname);
+      });
+    }
   }
 
   /** -------------------------
    *  NAV PATH TRACKING
    * ------------------------- */
-  private static initNavPaths(): string[] {
+  private static initNavPaths() {
     // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
-    const navPaths = [window.location.pathname];
     const pushNavPaths = () => {
-      navPaths.push(window.location.pathname);
-      console.log("Nav paths: " + navPaths);
+      this.navPaths.push(window.location.pathname);
+      console.log("Nav paths: " + this.navPaths);
     };
 
     onNavigation(pushNavPaths);
-    return navPaths;
   }
 
   /** -------------------------
@@ -117,4 +128,12 @@ function sessionDurationTimer() {
   localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   console.log("Previous page duration: " + duration);
   return duration;
+}
+
+function isMobileBrowser() {
+  return (
+    navigator.userAgent.includes("Mobile") ||
+    navigator.userAgent.includes("Android") ||
+    navigator.userAgent.includes("iPhone")
+  );
 }
