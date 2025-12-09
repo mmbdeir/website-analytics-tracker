@@ -175,6 +175,18 @@
     }
   });
 
+  // dist/reusables/isdevicemobile.js
+  var require_isdevicemobile = __commonJS({
+    "dist/reusables/isdevicemobile.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.isDeviceMobile = isDeviceMobile;
+      function isDeviceMobile() {
+        return navigator.userAgent.includes("Mobile") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("iPhone");
+      }
+    }
+  });
+
   // dist/trackers/page_specific.js
   var require_page_specific = __commonJS({
     "dist/trackers/page_specific.js"(exports) {
@@ -182,39 +194,54 @@
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PageSpecific = void 0;
       require_scrollyfills();
+      var isdevicemobile_1 = require_isdevicemobile();
       var CURRENT_SESSION_START_TIME = "current_session_start_time";
       var PageSpecific = class {
         static navPaths = [];
         static getMaxScrollDepth = () => 0;
         static init() {
-          this.navPaths = this.initNavPaths();
+          this.navPaths = [window.location.pathname];
+          this.initNavPaths();
           this.getMaxScrollDepth = this.initScrollDepth();
-          this.OnPageExist();
+          this.OnPageExit();
           localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
         }
         /** -------------------------
          *  EXIT PAGE FUNCTION
          * ------------------------- */
-        static OnPageExist() {
-          document.addEventListener("beforeunload", (e) => {
-            sendPageMetric({
-              navPaths: this.navPaths,
-              pageLeft: window.location.pathname
+        static OnPageExit() {
+          if ((0, isdevicemobile_1.isDeviceMobile)()) {
+            document.addEventListener("visibilitychange", (e) => {
+              if (document.visibilityState === "hidden") {
+                sendPageMetric({
+                  navPaths: this.navPaths,
+                  pageLeft: window.location.pathname
+                });
+                console.log("Page Left: " + window.localStorage.pathname);
+              }
             });
-            console.log("Page Left: " + window.localStorage.pathname);
-          });
+          } else {
+            document.addEventListener("beforeunload", (e) => {
+              sendPageMetric({
+                navPaths: this.navPaths,
+                pageLeft: window.location.pathname
+              });
+              console.log("Page Left: " + window.localStorage.pathname);
+            });
+          }
         }
         /** -------------------------
          *  NAV PATH TRACKING
          * ------------------------- */
         static initNavPaths() {
-          const navPaths = [window.location.pathname];
           const pushNavPaths = () => {
-            navPaths.push(window.location.pathname);
-            console.log("Nav paths: " + navPaths);
+            let currentPath = window.location.pathname;
+            if (this.navPaths[this.navPaths.length - 1] !== currentPath) {
+              this.navPaths.push(window.location.pathname);
+            }
+            console.log("Nav paths: " + this.navPaths);
           };
           onNavigation(pushNavPaths);
-          return navPaths;
         }
         /** -------------------------
          *  SCROLL DEPTH TRACKING

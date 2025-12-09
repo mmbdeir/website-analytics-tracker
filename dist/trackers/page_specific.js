@@ -2,41 +2,56 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PageSpecific = void 0;
 require("scrollyfills");
+const isdevicemobile_1 = require("../reusables/isdevicemobile");
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
 class PageSpecific {
     static navPaths = [];
     static getMaxScrollDepth = () => 0;
     static init() {
-        this.navPaths = this.initNavPaths();
+        this.navPaths = [window.location.pathname];
+        this.initNavPaths();
         this.getMaxScrollDepth = this.initScrollDepth();
-        this.OnPageExist();
+        this.OnPageExit();
         localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
     }
     /** -------------------------
      *  EXIT PAGE FUNCTION
      * ------------------------- */
-    static OnPageExist() {
-        // A SESSION SHOULD BE ON EVERY INVISIBILITY CHANGE IF ITS ON MOBILE. IF ITS ON PC THEN USE BEFORE UNLOAD
-        document.addEventListener("beforeunload", (e) => {
-            sendPageMetric({
-                navPaths: this.navPaths,
-                pageLeft: window.location.pathname,
+    static OnPageExit() {
+        if ((0, isdevicemobile_1.isDeviceMobile)()) {
+            document.addEventListener("visibilitychange", (e) => {
+                if (document.visibilityState === "hidden") {
+                    sendPageMetric({
+                        navPaths: this.navPaths,
+                        pageLeft: window.location.pathname,
+                    });
+                    console.log("Page Left: " + window.localStorage.pathname);
+                }
             });
-            console.log("Page Left: " + window.localStorage.pathname);
-        });
+        }
+        else {
+            document.addEventListener("beforeunload", (e) => {
+                sendPageMetric({
+                    navPaths: this.navPaths,
+                    pageLeft: window.location.pathname,
+                });
+                console.log("Page Left: " + window.localStorage.pathname);
+            });
+        }
     }
     /** -------------------------
      *  NAV PATH TRACKING
      * ------------------------- */
     static initNavPaths() {
         // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
-        const navPaths = [window.location.pathname];
         const pushNavPaths = () => {
-            navPaths.push(window.location.pathname);
-            console.log("Nav paths: " + navPaths);
+            let currentPath = window.location.pathname;
+            if (this.navPaths[this.navPaths.length - 1] !== currentPath) {
+                this.navPaths.push(window.location.pathname);
+            }
+            console.log("Nav paths: " + this.navPaths);
         };
         onNavigation(pushNavPaths);
-        return navPaths;
     }
     /** -------------------------
      *  SCROLL DEPTH TRACKING

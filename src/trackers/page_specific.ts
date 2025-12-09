@@ -1,4 +1,5 @@
 import "scrollyfills";
+import { isDeviceMobile } from "../reusables/isdevicemobile";
 
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
 
@@ -18,8 +19,7 @@ export class PageSpecific {
    *  EXIT PAGE FUNCTION
    * ------------------------- */
   private static OnPageExit() {
-    // A SESSION SHOULD BE ON EVERY INVISIBILITY CHANGE IF ITS ON MOBILE. IF ITS ON PC THEN USE BEFORE UNLOAD
-    if (isMobileBrowser()) {
+    if (isDeviceMobile()) {
       document.addEventListener("visibilitychange", (e) => {
         if (document.visibilityState === "hidden") {
           sendPageMetric({
@@ -46,7 +46,10 @@ export class PageSpecific {
   private static initNavPaths() {
     // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
     const pushNavPaths = () => {
-      this.navPaths.push(window.location.pathname);
+      let currentPath: string = window.location.pathname;
+      if (this.navPaths[this.navPaths.length - 1] !== currentPath) {
+        this.navPaths.push(window.location.pathname);
+      }
       console.log("Nav paths: " + this.navPaths);
     };
 
@@ -128,12 +131,4 @@ function sessionDurationTimer() {
   localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
   console.log("Previous page duration: " + duration);
   return duration;
-}
-
-function isMobileBrowser() {
-  return (
-    navigator.userAgent.includes("Mobile") ||
-    navigator.userAgent.includes("Android") ||
-    navigator.userAgent.includes("iPhone")
-  );
 }
