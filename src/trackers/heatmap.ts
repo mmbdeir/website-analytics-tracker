@@ -1,3 +1,5 @@
 export class heatmap {
-  static init() {}
+  static init() {
+    let percentReachedList = [];
+  }
 }

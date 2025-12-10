@@ -1,1 +1,1 @@
-{"version":3,"file":"heatmap.js","sourceRoot":"","sources":["../../src/trackers/heatmap.ts"],"names":[],"mappings":";;;AAAA,MAAa,OAAO;IAClB,MAAM,CAAC,IAAI,KAAI,CAAC;CACjB;AAFD,0BAEC"}
+{"version":3,"file":"heatmap.js","sourceRoot":"","sources":["../../src/trackers/heatmap.ts"],"names":[],"mappings":";;;AAAA,MAAa,OAAO;IAClB,MAAM,CAAC,IAAI;QACT,IAAI,kBAAkB,GAAG,EAAE,CAAC;IAC9B,CAAC;CACF;AAJD,0BAIC"}

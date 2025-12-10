@@ -10,13 +10,30 @@
     "dist/trackers/click.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.trackButtons = trackButtons;
-      function trackButtons() {
-        document.addEventListener("click", (e) => {
-          if (e.target.tagName.toLowerCase() === "button") {
-            console.log("Button click!!");
+      exports.TrackClicks = void 0;
+      var TrackClicks = class {
+        static init() {
+          document.addEventListener("click", (el) => {
+            getFingerprint(el.target);
+          });
+        }
+      };
+      exports.TrackClicks = TrackClicks;
+      function getFingerprint(el) {
+        const list = [];
+        while (el && el.nodeType === 1) {
+          let index = 1;
+          let currentEl = el;
+          while (currentEl.previousElementSibling) {
+            currentEl = currentEl.previousElementSibling;
+            index++;
           }
-        });
+          if (el.tagName != "HTML" && el.tagName != "BODY") {
+            list.unshift(`${el.tagName}:${index}`);
+          }
+          el = el.parentElement;
+        }
+        return list.join("/");
       }
     }
   });
@@ -314,12 +331,10 @@
       var session_1 = require_session();
       var performance_1 = require_performance();
       var page_specific_1 = require_page_specific();
-      document.addEventListener("DOMContentLoaded", () => {
-        (0, click_1.trackButtons)();
-      });
       (0, performance_1.loadSpeed)();
       session_1.SessionManager.init();
       page_specific_1.PageSpecific.init();
+      click_1.TrackClicks.init();
     }
   });
   require_index();
