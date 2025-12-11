@@ -4,7 +4,8 @@ exports.TrackClicks = void 0;
 class TrackClicks {
     static init() {
         document.addEventListener("click", (el) => {
-            hashString(getFingerprint(el.target));
+            const hashedString = hashString(getFingerprint(el.target));
+            // send the hashed string
         });
     }
 }
@@ -31,7 +32,6 @@ function hashString(string) {
         hash = (hash << 5) - hash + char.charCodeAt(0);
         hash |= 0;
     }
-    console.log(`el_${hash}`);
     return `el_${hash}`;
 }
 //# sourceMappingURL=click.js.map

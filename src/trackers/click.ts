@@ -1,7 +1,8 @@
 export class TrackClicks {
   static init() {
     document.addEventListener("click", (el) => {
-      hashString(getFingerprint(el.target as HTMLElement));
+      const hashedString = hashString(getFingerprint(el.target as HTMLElement));
+      // send the hashed string
     });
   }
 }

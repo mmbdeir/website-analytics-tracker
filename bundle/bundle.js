@@ -14,7 +14,7 @@
       var TrackClicks = class {
         static init() {
           document.addEventListener("click", (el) => {
-            hashString(getFingerprint(el.target));
+            const hashedString = hashString(getFingerprint(el.target));
           });
         }
       };
@@ -41,7 +41,6 @@
           hash = (hash << 5) - hash + char.charCodeAt(0);
           hash |= 0;
         }
-        console.log(`el_${hash}`);
         return `el_${hash}`;
       }
     }
