@@ -1,7 +1,7 @@
 export class TrackClicks {
   static init() {
     document.addEventListener("click", (el) => {
-      getFingerprint(el.target as HTMLElement);
+      hashString(getFingerprint(el.target as HTMLElement));
     });
   }
 }
@@ -21,4 +21,13 @@ function getFingerprint(el: Element): string {
     el = el.parentElement!;
   }
   return list.join("/");
+}
+
+function hashString(string: string) {
+  let hash = 0;
+  for (const char of string) {
+    hash = (hash << 5) - hash + char.charCodeAt(0);
+    hash |= 0;
+  }
+  return `el_${hash}`;
 }

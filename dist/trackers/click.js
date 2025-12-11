@@ -4,7 +4,7 @@ exports.TrackClicks = void 0;
 class TrackClicks {
     static init() {
         document.addEventListener("click", (el) => {
-            getFingerprint(el.target);
+            hashString(getFingerprint(el.target));
         });
     }
 }
@@ -18,11 +18,20 @@ function getFingerprint(el) {
             currentEl = currentEl.previousElementSibling;
             index++;
         }
-        if (el.tagName != "HTML" && el.tagName != "BODY") {
+        if (el.tagName !== "HTML" && el.tagName !== "BODY") {
             list.unshift(`${el.tagName}:${index}`);
         }
         el = el.parentElement;
     }
     return list.join("/");
+}
+function hashString(string) {
+    let hash = 0;
+    for (const char of string) {
+        hash = (hash << 5) - hash + char.charCodeAt(0);
+        hash |= 0;
+    }
+    console.log(`el_${hash}`);
+    return `el_${hash}`;
 }
 //# sourceMappingURL=click.js.map
