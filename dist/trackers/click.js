@@ -3,10 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrackClicks = void 0;
 class TrackClicks {
     static init() {
-        document.addEventListener("click", (el) => {
-            const hashedString = hashString(getFingerprint(el.target));
-            // send the hashed string
-        });
+        giveAttributes();
     }
 }
 exports.TrackClicks = TrackClicks;
@@ -34,4 +31,33 @@ function hashString(string) {
     }
     return `el_${hash}`;
 }
+const clickEvents = {};
+function giveAttributes() {
+    document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!target)
+            return;
+        if (!target.getAttribute("tr_uuid")) {
+            const print = getFingerprint(target);
+            const id = hashString(print);
+            target.setAttribute("tr_uuid", id);
+        }
+        let uuid = target.getAttribute("tr_uuid");
+        if (!clickEvents[uuid]) {
+            clickEvents[uuid] = {
+                count: 0,
+                points: [],
+            };
+        }
+        clickEvents[uuid].count += 1;
+        clickEvents[uuid].points.push([1, 1]);
+        /* on close of website
+          send data to server
+        */
+    });
+}
+//                               name       count
+//On a click, it increases the {"el_123": 4}.
+//When viewing the heatmap, run the html and calculate all the elements hashedpath and if it exists in the datastructure, change percentage gradient for color.
+//When sending, dont send on everyclick, instead store it and use a sendBeacon() to send click count when user closes the site.
 //# sourceMappingURL=click.js.map

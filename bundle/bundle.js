@@ -13,9 +13,7 @@
       exports.TrackClicks = void 0;
       var TrackClicks = class {
         static init() {
-          document.addEventListener("click", (el) => {
-            const hashedString = hashString(getFingerprint(el.target));
-          });
+          giveAttributes();
         }
       };
       exports.TrackClicks = TrackClicks;
@@ -42,6 +40,28 @@
           hash |= 0;
         }
         return `el_${hash}`;
+      }
+      var clickEvents = {};
+      function giveAttributes() {
+        document.addEventListener("click", (e) => {
+          const target = e.target;
+          if (!target)
+            return;
+          if (!target.getAttribute("tr_uuid")) {
+            const print = getFingerprint(target);
+            const id = hashString(print);
+            target.setAttribute("tr_uuid", id);
+          }
+          let uuid = target.getAttribute("tr_uuid");
+          if (!clickEvents[uuid]) {
+            clickEvents[uuid] = {
+              count: 0,
+              points: []
+            };
+          }
+          clickEvents[uuid].count += 1;
+          clickEvents[uuid].points.push([1, 1]);
+        });
       }
     }
   });
