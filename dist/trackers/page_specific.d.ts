@@ -6,7 +6,6 @@ export declare class PageSpecific {
     /** -------------------------
      *  EXIT PAGE FUNCTION
      * ------------------------- */
-    private static OnPageExit;
     /** -------------------------
      *  NAV PATH TRACKING
      * ------------------------- */

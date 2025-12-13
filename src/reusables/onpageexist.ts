@@ -1,16 +1,16 @@
 import { isDeviceMobile } from "../reusables/isdevicemobile";
 
-export function OnPageExit() {
+export function OnPageExit(extra: Record<string, any> = {}) {
   if (isDeviceMobile()) {
     document.addEventListener("visibilitychange", (e) => {
       if (document.visibilityState === "hidden") {
-        sendPageMetric({});
+        sendPageMetric(extra);
         console.log("Page Left: " + window.localStorage.pathname);
       }
     });
   } else {
     document.addEventListener("beforeunload", (e) => {
-      sendPageMetric({});
+      sendPageMetric(extra);
       console.log("Page Left: " + window.localStorage.pathname);
     });
   }

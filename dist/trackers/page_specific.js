@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PageSpecific = void 0;
 require("scrollyfills");
-const isdevicemobile_1 = require("../reusables/isdevicemobile");
+const onpageexist_1 = require("../reusables/onpageexist");
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
 class PageSpecific {
     static navPaths = [];
@@ -11,34 +11,38 @@ class PageSpecific {
         this.navPaths = [window.location.pathname];
         this.initNavPaths();
         this.getMaxScrollDepth = this.initScrollDepth();
-        this.OnPageExit();
+        (0, onpageexist_1.OnPageExit)({
+            navPaths: this.navPaths,
+            pageLeft: window.location.pathname,
+        });
         localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
     }
     /** -------------------------
      *  EXIT PAGE FUNCTION
      * ------------------------- */
-    static OnPageExit() {
-        if ((0, isdevicemobile_1.isDeviceMobile)()) {
-            document.addEventListener("visibilitychange", (e) => {
-                if (document.visibilityState === "hidden") {
-                    sendPageMetric({
-                        navPaths: this.navPaths,
-                        pageLeft: window.location.pathname,
-                    });
-                    console.log("Page Left: " + window.localStorage.pathname);
-                }
+    /*
+    private static OnPageExit() {
+      if (isDeviceMobile()) {
+        document.addEventListener("visibilitychange", (e) => {
+          if (document.visibilityState === "hidden") {
+            sendPageMetric({
+              navPaths: this.navPaths,
+              pageLeft: window.location.pathname,
             });
-        }
-        else {
-            document.addEventListener("beforeunload", (e) => {
-                sendPageMetric({
-                    navPaths: this.navPaths,
-                    pageLeft: window.location.pathname,
-                });
-                console.log("Page Left: " + window.localStorage.pathname);
-            });
-        }
-    }
+            console.log("Page Left: " + window.localStorage.pathname);
+          }
+        });
+      } else {
+        document.addEventListener("beforeunload", (e) => {
+      sendPageMetric({
+        navPaths: this.navPaths,
+        pageLeft: window.location.pathname,
+      });
+      console.log("Page Left: " + window.localStorage.pathname);
+    });
+  }
+  }
+  */
     /** -------------------------
      *  NAV PATH TRACKING
      * ------------------------- */

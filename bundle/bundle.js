@@ -236,6 +236,36 @@
     }
   });
 
+  // dist/reusables/onpageexist.js
+  var require_onpageexist = __commonJS({
+    "dist/reusables/onpageexist.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.OnPageExit = OnPageExit;
+      var isdevicemobile_1 = require_isdevicemobile();
+      function OnPageExit(extra = {}) {
+        if ((0, isdevicemobile_1.isDeviceMobile)()) {
+          document.addEventListener("visibilitychange", (e) => {
+            if (document.visibilityState === "hidden") {
+              sendPageMetric(extra);
+              console.log("Page Left: " + window.localStorage.pathname);
+            }
+          });
+        } else {
+          document.addEventListener("beforeunload", (e) => {
+            sendPageMetric(extra);
+            console.log("Page Left: " + window.localStorage.pathname);
+          });
+        }
+      }
+      function sendPageMetric(extra = {}) {
+        navigator.sendBeacon("ENDPOINT", JSON.stringify({
+          ...extra
+        }));
+      }
+    }
+  });
+
   // dist/trackers/page_specific.js
   var require_page_specific = __commonJS({
     "dist/trackers/page_specific.js"(exports) {
@@ -243,7 +273,7 @@
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PageSpecific = void 0;
       require_scrollyfills();
-      var isdevicemobile_1 = require_isdevicemobile();
+      var onpageexist_1 = require_onpageexist();
       var CURRENT_SESSION_START_TIME = "current_session_start_time";
       var PageSpecific = class {
         static navPaths = [];
@@ -252,33 +282,38 @@
           this.navPaths = [window.location.pathname];
           this.initNavPaths();
           this.getMaxScrollDepth = this.initScrollDepth();
-          this.OnPageExit();
+          (0, onpageexist_1.OnPageExit)({
+            navPaths: this.navPaths,
+            pageLeft: window.location.pathname
+          });
           localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
         }
         /** -------------------------
          *  EXIT PAGE FUNCTION
          * ------------------------- */
-        static OnPageExit() {
-          if ((0, isdevicemobile_1.isDeviceMobile)()) {
-            document.addEventListener("visibilitychange", (e) => {
-              if (document.visibilityState === "hidden") {
-                sendPageMetric({
-                  navPaths: this.navPaths,
-                  pageLeft: window.location.pathname
-                });
-                console.log("Page Left: " + window.localStorage.pathname);
-              }
-            });
-          } else {
-            document.addEventListener("beforeunload", (e) => {
-              sendPageMetric({
-                navPaths: this.navPaths,
-                pageLeft: window.location.pathname
+        /*
+          private static OnPageExit() {
+            if (isDeviceMobile()) {
+              document.addEventListener("visibilitychange", (e) => {
+                if (document.visibilityState === "hidden") {
+                  sendPageMetric({
+                    navPaths: this.navPaths,
+                    pageLeft: window.location.pathname,
+                  });
+                  console.log("Page Left: " + window.localStorage.pathname);
+                }
               });
-              console.log("Page Left: " + window.localStorage.pathname);
+            } else {
+              document.addEventListener("beforeunload", (e) => {
+            sendPageMetric({
+              navPaths: this.navPaths,
+              pageLeft: window.location.pathname,
             });
-          }
+            console.log("Page Left: " + window.localStorage.pathname);
+          });
         }
+        }
+        */
         /** -------------------------
          *  NAV PATH TRACKING
          * ------------------------- */
