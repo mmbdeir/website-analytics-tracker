@@ -59,8 +59,12 @@
               points: []
             };
           }
+          const rect = target.getBoundingClientRect();
+          const x = e.offsetX / rect.width * 100;
+          const y = e.offsetY / rect.height * 100;
           clickEvents[uuid].count += 1;
-          clickEvents[uuid].points.push([1, 1]);
+          clickEvents[uuid].points.push([x, y]);
+          console.log(clickEvents);
         });
       }
     }
