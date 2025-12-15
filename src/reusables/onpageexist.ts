@@ -1,17 +1,22 @@
 import { isDeviceMobile } from "../reusables/isdevicemobile";
 
-export function OnPageExit(extra: Record<string, any> = {}) {
+export function OnPageExit(getExtra: () => Record<string, any>) {
+  const handler = () => {
+    const extra = getExtra();
+    sendPageMetric(extra);
+    console.log("Page Left: " + window.location.pathname);
+  };
   if (isDeviceMobile()) {
     document.addEventListener("visibilitychange", (e) => {
       if (document.visibilityState === "hidden") {
-        sendPageMetric(extra);
-        console.log("Page Left: " + window.localStorage.pathname);
+        console.log("Page Left: " + window.location.pathname);
+        handler();
       }
     });
   } else {
     document.addEventListener("beforeunload", (e) => {
-      sendPageMetric(extra);
-      console.log("Page Left: " + window.localStorage.pathname);
+      handler();
+      console.log("Page Left: " + window.location.pathname);
     });
   }
 }

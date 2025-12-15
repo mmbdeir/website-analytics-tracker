@@ -2,19 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OnPageExit = OnPageExit;
 const isdevicemobile_1 = require("../reusables/isdevicemobile");
-function OnPageExit(extra = {}) {
+function OnPageExit(getExtra) {
+    const handler = () => {
+        const extra = getExtra();
+        sendPageMetric(extra);
+        console.log("Page Left: " + window.location.pathname);
+    };
     if ((0, isdevicemobile_1.isDeviceMobile)()) {
         document.addEventListener("visibilitychange", (e) => {
             if (document.visibilityState === "hidden") {
-                sendPageMetric(extra);
-                console.log("Page Left: " + window.localStorage.pathname);
+                console.log("Page Left: " + window.location.pathname);
+                handler();
             }
         });
     }
     else {
         document.addEventListener("beforeunload", (e) => {
-            sendPageMetric(extra);
-            console.log("Page Left: " + window.localStorage.pathname);
+            handler();
+            console.log("Page Left: " + window.location.pathname);
         });
     }
 }

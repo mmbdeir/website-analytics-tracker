@@ -11,10 +11,10 @@ class PageSpecific {
         this.navPaths = [window.location.pathname];
         this.initNavPaths();
         this.getMaxScrollDepth = this.initScrollDepth();
-        (0, onpageexist_1.OnPageExit)({
+        (0, onpageexist_1.OnPageExit)(() => ({
             navPaths: this.navPaths,
             pageLeft: window.location.pathname,
-        });
+        }));
         localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
     }
     /** -------------------------
