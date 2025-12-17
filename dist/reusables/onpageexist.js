@@ -1,17 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OnPageExit = OnPageExit;
+exports.OnSiteExit = OnSiteExit;
 const isdevicemobile_1 = require("../reusables/isdevicemobile");
-function OnPageExit(getExtra) {
+function OnSiteExit(getExtra) {
     const handler = () => {
         const extra = getExtra();
         sendPageMetric(extra);
-        console.log("Page Left: " + window.location.pathname);
     };
     if ((0, isdevicemobile_1.isDeviceMobile)()) {
         document.addEventListener("visibilitychange", (e) => {
             if (document.visibilityState === "hidden") {
-                console.log("Page Left: " + window.location.pathname);
                 handler();
             }
         });
@@ -19,7 +17,6 @@ function OnPageExit(getExtra) {
     else {
         document.addEventListener("beforeunload", (e) => {
             handler();
-            console.log("Page Left: " + window.location.pathname);
         });
     }
 }

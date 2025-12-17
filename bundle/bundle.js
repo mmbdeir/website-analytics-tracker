@@ -5,12 +5,57 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
+  // dist/reusables/isdevicemobile.js
+  var require_isdevicemobile = __commonJS({
+    "dist/reusables/isdevicemobile.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.isDeviceMobile = isDeviceMobile;
+      function isDeviceMobile() {
+        return navigator.userAgent.includes("Mobile") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("iPhone");
+      }
+    }
+  });
+
+  // dist/reusables/onpageexist.js
+  var require_onpageexist = __commonJS({
+    "dist/reusables/onpageexist.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.OnSiteExit = OnSiteExit;
+      var isdevicemobile_1 = require_isdevicemobile();
+      function OnSiteExit(getExtra) {
+        const handler = () => {
+          const extra = getExtra();
+          sendPageMetric(extra);
+        };
+        if ((0, isdevicemobile_1.isDeviceMobile)()) {
+          document.addEventListener("visibilitychange", (e) => {
+            if (document.visibilityState === "hidden") {
+              handler();
+            }
+          });
+        } else {
+          document.addEventListener("beforeunload", (e) => {
+            handler();
+          });
+        }
+      }
+      function sendPageMetric(extra = {}) {
+        navigator.sendBeacon("ENDPOINT", JSON.stringify({
+          ...extra
+        }));
+      }
+    }
+  });
+
   // dist/trackers/click.js
   var require_click = __commonJS({
     "dist/trackers/click.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.TrackClicks = void 0;
+      var onpageexist_1 = require_onpageexist();
       var TrackClicks = class {
         static init() {
           giveAttributes();
@@ -47,25 +92,28 @@
           const target = e.target;
           if (!target)
             return;
+          const page = window.location.pathname;
+          clickEvents[page] ??= {};
           if (!target.getAttribute("tr_uuid")) {
             const print = getFingerprint(target);
             const id = hashString(print);
             target.setAttribute("tr_uuid", id);
           }
           let uuid = target.getAttribute("tr_uuid");
-          if (!clickEvents[uuid]) {
-            clickEvents[uuid] = {
-              count: 0,
-              points: []
-            };
-          }
+          clickEvents[page][uuid] ??= {
+            count: 0,
+            points: []
+          };
           const rect = target.getBoundingClientRect();
-          const x = e.offsetX / rect.width * 100;
-          const y = e.offsetY / rect.height * 100;
-          clickEvents[uuid].count += 1;
-          clickEvents[uuid].points.push([x, y]);
+          const x = Math.round(e.offsetX / rect.width * 100);
+          const y = Math.round(e.offsetY / rect.height * 100);
+          clickEvents[page][uuid].count += 1;
+          clickEvents[page][uuid].points.push([x, y]);
           console.log(clickEvents);
         });
+        (0, onpageexist_1.OnSiteExit)(() => ({
+          clickEvents
+        }));
       }
     }
   });
@@ -224,53 +272,6 @@
     }
   });
 
-  // dist/reusables/isdevicemobile.js
-  var require_isdevicemobile = __commonJS({
-    "dist/reusables/isdevicemobile.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.isDeviceMobile = isDeviceMobile;
-      function isDeviceMobile() {
-        return navigator.userAgent.includes("Mobile") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("iPhone");
-      }
-    }
-  });
-
-  // dist/reusables/onpageexist.js
-  var require_onpageexist = __commonJS({
-    "dist/reusables/onpageexist.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.OnPageExit = OnPageExit;
-      var isdevicemobile_1 = require_isdevicemobile();
-      function OnPageExit(getExtra) {
-        const handler = () => {
-          const extra = getExtra();
-          sendPageMetric(extra);
-          console.log("Page Left: " + window.location.pathname);
-        };
-        if ((0, isdevicemobile_1.isDeviceMobile)()) {
-          document.addEventListener("visibilitychange", (e) => {
-            if (document.visibilityState === "hidden") {
-              console.log("Page Left: " + window.location.pathname);
-              handler();
-            }
-          });
-        } else {
-          document.addEventListener("beforeunload", (e) => {
-            handler();
-            console.log("Page Left: " + window.location.pathname);
-          });
-        }
-      }
-      function sendPageMetric(extra = {}) {
-        navigator.sendBeacon("ENDPOINT", JSON.stringify({
-          ...extra
-        }));
-      }
-    }
-  });
-
   // dist/trackers/page_specific.js
   var require_page_specific = __commonJS({
     "dist/trackers/page_specific.js"(exports) {
@@ -287,7 +288,7 @@
           this.navPaths = [window.location.pathname];
           this.initNavPaths();
           this.getMaxScrollDepth = this.initScrollDepth();
-          (0, onpageexist_1.OnPageExit)(() => ({
+          (0, onpageexist_1.OnSiteExit)(() => ({
             navPaths: this.navPaths,
             pageLeft: window.location.pathname
           }));

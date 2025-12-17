@@ -1,3 +1,5 @@
+import { OnSiteExit } from "../reusables/onpageexist";
+
 export class TrackClicks {
   static init() {
     giveAttributes();
@@ -32,10 +34,13 @@ function hashString(string: string) {
 
 type ClickPoint = Record<
   string,
-  {
-    count: number;
-    points: [number, number][];
-  }
+  Record<
+    string,
+    {
+      count: number;
+      points: [number, number][];
+    }
+  >
 >;
 const clickEvents: ClickPoint = {};
 
@@ -43,31 +48,35 @@ function giveAttributes() {
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement | null;
     if (!target) return;
+    const page = window.location.pathname;
+    clickEvents[page] ??= {};
+
     if (!target.getAttribute("tr_uuid")) {
       const print = getFingerprint(target);
       const id = hashString(print);
       target.setAttribute("tr_uuid", id);
     }
-    let uuid: string = target.getAttribute("tr_uuid")!;
-    if (!clickEvents[uuid]) {
-      clickEvents[uuid] = {
-        count: 0,
-        points: [],
-      };
-    }
-    const rect = target.getBoundingClientRect();
-    const x = (e.offsetX / rect.width) * 100;
-    const y = (e.offsetY / rect.height) * 100;
 
-    clickEvents[uuid].count += 1;
-    clickEvents[uuid].points.push([x, y]);
+    let uuid: string = target.getAttribute("tr_uuid")!;
+
+    clickEvents[page][uuid] ??= {
+      count: 0,
+      points: [],
+    };
+
+    const rect = target.getBoundingClientRect();
+    const x = Math.round((e.offsetX / rect.width) * 100);
+    const y = Math.round((e.offsetY / rect.height) * 100);
+
+    clickEvents[page][uuid].count += 1;
+    clickEvents[page][uuid].points.push([x, y]);
+
     console.log(clickEvents);
-    /* on close of website 
-      send data to server
-    */
   });
+  OnSiteExit(() => ({
+    clickEvents: clickEvents,
+  }));
 }
 //                               name       count
-//On a click, it increases the {"el_123": 4}.
 //When viewing the heatmap, run the html and calculate all the elements hashedpath and if it exists in the datastructure, change percentage gradient for color.
 //When sending, dont send on everyclick, instead store it and use a sendBeacon() to send click count when user closes the site.

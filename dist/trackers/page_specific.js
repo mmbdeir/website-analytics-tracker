@@ -11,7 +11,7 @@ class PageSpecific {
         this.navPaths = [window.location.pathname];
         this.initNavPaths();
         this.getMaxScrollDepth = this.initScrollDepth();
-        (0, onpageexist_1.OnPageExit)(() => ({
+        (0, onpageexist_1.OnSiteExit)(() => ({
             navPaths: this.navPaths,
             pageLeft: window.location.pathname,
         }));
