@@ -61,7 +61,4 @@ function giveAttributes() {
         clickEvents: clickEvents,
     }));
 }
-//                               name       count
-//When viewing the heatmap, run the html and calculate all the elements hashedpath and if it exists in the datastructure, change percentage gradient for color.
-//When sending, dont send on everyclick, instead store it and use a sendBeacon() to send click count when user closes the site.
 //# sourceMappingURL=click.js.map
