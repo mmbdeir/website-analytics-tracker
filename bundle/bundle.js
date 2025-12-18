@@ -118,72 +118,11 @@
     }
   });
 
-  // dist/reusables/throttle.js
-  var require_throttle = __commonJS({
-    "dist/reusables/throttle.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.throttle = throttle;
-      function throttle(fn, delay) {
-        let isThr = true;
-        return function() {
-          if (isThr) {
-            fn();
-            isThr = false;
-            setTimeout(() => isThr = true, delay);
-          }
-        };
-      }
-    }
-  });
-
   // dist/trackers/session.js
   var require_session = __commonJS({
     "dist/trackers/session.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.SessionManager = void 0;
-      var throttle_1 = require_throttle();
-      var SESSION_TIMEOUT_MS = 3 * 60 * 1e3;
-      var LAST_ACTIVE_KEY = "at-last-active";
-      function newSession() {
-        try {
-        } catch (error) {
-          console.log("Local storage doesnt work cuz: " + error);
-        }
-      }
-      var SessionManager = class {
-        static initilized = false;
-        static init() {
-          if (this.initilized)
-            return;
-          this.initilized = true;
-          checkForNewSession();
-          checkForActivity();
-        }
-      };
-      exports.SessionManager = SessionManager;
-      function checkForActivity() {
-        window.addEventListener("click", updateActivity);
-        window.addEventListener("scroll", updateActivity);
-        window.addEventListener("keydown", updateActivity);
-        window.addEventListener("mousemove", updateActivity);
-        window.addEventListener("touchstart", updateActivity);
-      }
-      function checkForNewSession() {
-        try {
-          let timeSinceLastUpdate = Date.now() - Number(localStorage.getItem(LAST_ACTIVE_KEY) || 0);
-          localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
-          if (timeSinceLastUpdate > SESSION_TIMEOUT_MS) {
-            newSession();
-          }
-        } catch (e) {
-          console.log("Local storage doesnt work cuz: " + e);
-        }
-      }
-      var updateActivity = (0, throttle_1.throttle)(() => {
-        checkForNewSession();
-      }, 1500);
     }
   });
 

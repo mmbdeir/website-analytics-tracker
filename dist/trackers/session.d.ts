@@ -1,5 +1,2 @@
-export declare class SessionManager {
-    private static initilized;
-    static init(): void;
-}
+export {};
 //# sourceMappingURL=session.d.ts.map
