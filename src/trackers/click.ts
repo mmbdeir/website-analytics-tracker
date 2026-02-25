@@ -73,6 +73,7 @@ function giveAttributes() {
 
     console.log(clickEvents);
   });
+  window.open("https://example.com", "_blank");
   SendOnSiteExit(() => ({
     clickEvents: clickEvents,
   }));

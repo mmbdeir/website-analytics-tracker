@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npx esbuild src/index.ts --bundle --minify --format=iife --outfile=bundle/bundle.js",
+    "bundle": "esbuild dist/index.js --bundle --outfile=bundle/bundle.js --watch",
     "compile": "npx tsc --watch",
-    "server": "npx live-server --port=3005 --cors"
+    "server": "npx live-server --port=3005 --cors",
+    "start": "node index.ts"
   },
   "repository": {
     "type": "git",
