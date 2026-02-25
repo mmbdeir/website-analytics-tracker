@@ -6,7 +6,7 @@
     "bundle": "esbuild dist/index.js --bundle --outfile=bundle/bundle.js --watch",
     "compile": "npx tsc --watch",
     "server": "npx live-server --port=3005 --cors",
-    "start": "node ./bundle/index.js"
+    "start": "node ./bundle/bundle.js"
   },
   "repository": {
     "type": "git",
