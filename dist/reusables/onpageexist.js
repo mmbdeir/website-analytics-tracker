@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OnSiteExit = OnSiteExit;
+exports.SendOnSiteExit = SendOnSiteExit;
 const isdevicemobile_1 = require("../reusables/isdevicemobile");
-function OnSiteExit(getExtra) {
+const siteID = document.querySelector("script[data-site-id]")
+    ?.dataset.siteId;
+function SendOnSiteExit(getExtra) {
     const handler = () => {
         const extra = getExtra();
         sendPageMetric(extra);
@@ -21,8 +23,10 @@ function OnSiteExit(getExtra) {
     }
 }
 function sendPageMetric(extra = {}) {
-    navigator.sendBeacon("ENDPOINT", JSON.stringify({
-        ...extra,
-    }));
+    navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, new Blob([
+        JSON.stringify({
+            ...extra,
+        }),
+    ], { type: "application/json" }));
 }
 //# sourceMappingURL=onpageexist.js.map

@@ -1,6 +1,9 @@
 import { isDeviceMobile } from "../reusables/isdevicemobile";
 
-export function OnSiteExit(getExtra: () => Record<string, any>) {
+const siteID = document.querySelector<HTMLScriptElement>("script[data-site-id]")
+  ?.dataset.siteId;
+
+export function SendOnSiteExit(getExtra: () => Record<string, any>) {
   const handler = () => {
     const extra = getExtra();
     sendPageMetric(extra);
@@ -20,9 +23,14 @@ export function OnSiteExit(getExtra: () => Record<string, any>) {
 
 function sendPageMetric(extra: Record<string, any> = {}) {
   navigator.sendBeacon(
-    "ENDPOINT",
-    JSON.stringify({
-      ...extra,
-    })
+    `https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`,
+    new Blob(
+      [
+        JSON.stringify({
+          ...extra,
+        }),
+      ],
+      { type: "application/json" }
+    )
   );
 }

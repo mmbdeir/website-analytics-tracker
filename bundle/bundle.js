@@ -22,9 +22,10 @@
     "dist/reusables/onpageexist.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.OnSiteExit = OnSiteExit;
+      exports.SendOnSiteExit = SendOnSiteExit;
       var isdevicemobile_1 = require_isdevicemobile();
-      function OnSiteExit(getExtra) {
+      var siteID = document.querySelector("script[data-site-id]")?.dataset.siteId;
+      function SendOnSiteExit(getExtra) {
         const handler = () => {
           const extra = getExtra();
           sendPageMetric(extra);
@@ -42,9 +43,11 @@
         }
       }
       function sendPageMetric(extra = {}) {
-        navigator.sendBeacon("ENDPOINT", JSON.stringify({
-          ...extra
-        }));
+        navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, new Blob([
+          JSON.stringify({
+            ...extra
+          })
+        ], { type: "application/json" }));
       }
     }
   });
@@ -111,18 +114,10 @@
           clickEvents[page][uuid].points.push([x, y]);
           console.log(clickEvents);
         });
-        (0, onpageexist_1.OnSiteExit)(() => ({
+        (0, onpageexist_1.SendOnSiteExit)(() => ({
           clickEvents
         }));
       }
-    }
-  });
-
-  // dist/trackers/session.js
-  var require_session = __commonJS({
-    "dist/trackers/session.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
     }
   });
 
@@ -132,9 +127,10 @@
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.loadSpeed = loadSpeed;
+      var onpageexist_1 = require_onpageexist();
       function loadSpeed() {
         window.addEventListener("DOMContentLoaded", () => {
-          navigator.sendBeacon("ENDPOINT", JSON.stringify({
+          (0, onpageexist_1.SendOnSiteExit)(() => ({
             page: window.location.pathname,
             domLoadSpeed: performance.now().toFixed(1)
           }));
@@ -223,6 +219,7 @@
       require_scrollyfills();
       var onpageexist_1 = require_onpageexist();
       var CURRENT_SESSION_START_TIME = "current_session_start_time";
+      var siteID = document.querySelector("script[data-site-id]")?.dataset.siteId;
       var PageSpecific = class {
         static navPaths = [];
         static getMaxScrollDepth = () => 0;
@@ -230,7 +227,7 @@
           this.navPaths = [window.location.pathname];
           this.initNavPaths();
           this.getMaxScrollDepth = this.initScrollDepth();
-          (0, onpageexist_1.OnSiteExit)(() => ({
+          (0, onpageexist_1.SendOnSiteExit)(() => ({
             navPaths: this.navPaths,
             pageLeft: window.location.pathname
           }));
@@ -304,12 +301,14 @@
       exports.PageSpecific = PageSpecific;
       function sendPageMetric(extra = {}) {
         const duration = sessionDurationTimer();
-        navigator.sendBeacon("ENDPOINT", JSON.stringify({
-          page: window.location.pathname,
-          pageDuration: duration,
-          scrollDepth: PageSpecific.getMaxScrollDepth(),
-          ...extra
-        }));
+        navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, new Blob([
+          JSON.stringify({
+            page: window.location.pathname,
+            pageDuration: duration,
+            scrollDepth: PageSpecific.getMaxScrollDepth(),
+            ...extra
+          })
+        ], { type: "application/json" }));
         console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
       }
       function onNavigation(callback) {
@@ -343,11 +342,9 @@
     "dist/index.js"(exports) {
       Object.defineProperty(exports, "__esModule", { value: true });
       var click_1 = require_click();
-      var session_1 = require_session();
       var performance_1 = require_performance();
       var page_specific_1 = require_page_specific();
       (0, performance_1.loadSpeed)();
-      session_1.SessionManager.init();
       page_specific_1.PageSpecific.init();
       click_1.TrackClicks.init();
     }

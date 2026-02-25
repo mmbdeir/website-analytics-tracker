@@ -1,10 +1,15 @@
 import { TrackClicks } from "./trackers/click";
-import { SessionManager } from "./trackers/session";
+// import { SessionManager } from "./trackers/session";
 import { loadSpeed } from "./trackers/performance";
 import { PageSpecific } from "./trackers/page_specific";
 
 // Add screentime heatmap or analytics/statistics
 loadSpeed();
-SessionManager.init();
+// SessionManager.init();
 PageSpecific.init();
 TrackClicks.init();
+
+/*
+All the metrics are accuratly tracked, now I just need to send them to the server to agrigate data.
+First focus on the side of the person creating a website. 
+*/

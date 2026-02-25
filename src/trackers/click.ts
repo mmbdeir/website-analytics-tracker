@@ -1,4 +1,4 @@
-import { OnSiteExit } from "../reusables/onpageexist";
+import { SendOnSiteExit } from "../reusables/onpageexist";
 
 export class TrackClicks {
   static init() {
@@ -73,7 +73,7 @@ function giveAttributes() {
 
     console.log(clickEvents);
   });
-  OnSiteExit(() => ({
+  SendOnSiteExit(() => ({
     clickEvents: clickEvents,
   }));
 }

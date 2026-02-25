@@ -1,7 +1,9 @@
 import "scrollyfills";
-import { OnSiteExit } from "../reusables/onpageexist";
+import { SendOnSiteExit } from "../reusables/onpageexist";
 
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
+const siteID = document.querySelector<HTMLScriptElement>("script[data-site-id]")
+  ?.dataset.siteId;
 
 export class PageSpecific {
   private static navPaths: string[] = [];
@@ -11,7 +13,7 @@ export class PageSpecific {
     this.navPaths = [window.location.pathname];
     this.initNavPaths();
     this.getMaxScrollDepth = this.initScrollDepth();
-    OnSiteExit(() => ({
+    SendOnSiteExit(() => ({
       navPaths: this.navPaths,
       pageLeft: window.location.pathname,
     }));
@@ -95,13 +97,18 @@ export class PageSpecific {
 function sendPageMetric(extra: Record<string, any> = {}) {
   const duration = sessionDurationTimer();
   navigator.sendBeacon(
-    "ENDPOINT",
-    JSON.stringify({
-      page: window.location.pathname,
-      pageDuration: duration,
-      scrollDepth: PageSpecific.getMaxScrollDepth(),
-      ...extra,
-    })
+    `https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`,
+    new Blob(
+      [
+        JSON.stringify({
+          page: window.location.pathname,
+          pageDuration: duration,
+          scrollDepth: PageSpecific.getMaxScrollDepth(),
+          ...extra,
+        }),
+      ],
+      { type: "application/json" }
+    )
   );
   console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
 }

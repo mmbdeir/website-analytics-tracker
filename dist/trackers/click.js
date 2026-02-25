@@ -57,7 +57,7 @@ function giveAttributes() {
         clickEvents[page][uuid].points.push([x, y]);
         console.log(clickEvents);
     });
-    (0, onpageexist_1.OnSiteExit)(() => ({
+    (0, onpageexist_1.SendOnSiteExit)(() => ({
         clickEvents: clickEvents,
     }));
 }
