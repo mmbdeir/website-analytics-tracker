@@ -7,30 +7,19 @@ export function SendOnSiteExit(getExtra: () => Record<string, any>) {
   const handler = () => {
     const extra = getExtra();
     sendPageMetric(extra);
+    console.log("oou");
   };
-  if (isDeviceMobile()) {
-    document.addEventListener("visibilitychange", (e) => {
-      if (document.visibilityState === "hidden") {
-        handler();
-      }
-    });
-  } else {
-    document.addEventListener("beforeunload", (e) => {
+  document.addEventListener("visibilitychange", (e) => {
+    if (document.visibilityState === "hidden") {
       handler();
-    });
-  }
+    }
+  });
 }
 
 function sendPageMetric(extra: Record<string, any> = {}) {
-  navigator.sendBeacon(
-    `https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`,
-    new Blob(
-      [
-        JSON.stringify({
-          ...extra,
-        }),
-      ],
-      { type: "application/json" }
-    )
-  );
+  fetch(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(extra),
+  });
 }
