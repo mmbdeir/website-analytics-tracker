@@ -21,6 +21,5 @@ function sendPageMetric(extra = {}) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(extra),
     });
-    console.log(extra);
 }
 //# sourceMappingURL=onpageexist.js.map

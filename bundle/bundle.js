@@ -30,14 +30,13 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(extra)
         });
-        console.log(extra);
       }
     }
   });
 
-  // dist/trackers/click.js
-  var require_click = __commonJS({
-    "dist/trackers/click.js"(exports) {
+  // dist/trackers/blahblah.js
+  var require_blahblah = __commonJS({
+    "dist/trackers/blahblah.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.TrackClicks = void 0;
@@ -104,9 +103,9 @@
     }
   });
 
-  // dist/trackers/performance.js
-  var require_performance = __commonJS({
-    "dist/trackers/performance.js"(exports) {
+  // dist/trackers/blahblahblah.js
+  var require_blahblahblah = __commonJS({
+    "dist/trackers/blahblahblah.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.loadSpeed = loadSpeed;
@@ -193,9 +192,9 @@
     }
   });
 
-  // dist/trackers/page_specific.js
-  var require_page_specific = __commonJS({
-    "dist/trackers/page_specific.js"(exports) {
+  // dist/trackers/blah.js
+  var require_blah = __commonJS({
+    "dist/trackers/blah.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PageSpecific = void 0;
@@ -284,7 +283,7 @@
       exports.PageSpecific = PageSpecific;
       function sendPageMetric(extra = {}) {
         const duration = sessionDurationTimer();
-        navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, new Blob([
+        navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/this_website/${siteID}`, new Blob([
           JSON.stringify({
             page: window.location.pathname,
             pageDuration: duration,
@@ -324,12 +323,12 @@
   var require_index = __commonJS({
     "dist/index.js"(exports) {
       Object.defineProperty(exports, "__esModule", { value: true });
-      var click_1 = require_click();
-      var performance_1 = require_performance();
-      var page_specific_1 = require_page_specific();
-      (0, performance_1.loadSpeed)();
-      page_specific_1.PageSpecific.init();
-      click_1.TrackClicks.init();
+      var blahblah_1 = require_blahblah();
+      var blahblahblah_1 = require_blahblahblah();
+      var blah_1 = require_blah();
+      (0, blahblahblah_1.loadSpeed)();
+      blah_1.PageSpecific.init();
+      blahblah_1.TrackClicks.init();
     }
   });
   require_index();
