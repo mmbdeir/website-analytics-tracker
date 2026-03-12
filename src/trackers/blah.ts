@@ -97,7 +97,7 @@ export class PageSpecific {
 function sendPageMetric(extra: Record<string, any> = {}) {
   const duration = sessionDurationTimer();
   navigator.sendBeacon(
-    `https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`,
+    `https://analytics-backend-2h8r.onrender.com/this_website/${siteID}`,
     new Blob(
       [
         JSON.stringify({
@@ -107,8 +107,8 @@ function sendPageMetric(extra: Record<string, any> = {}) {
           ...extra,
         }),
       ],
-      { type: "application/json" }
-    )
+      { type: "application/json" },
+    ),
   );
   console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
 }
