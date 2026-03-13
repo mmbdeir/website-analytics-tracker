@@ -1,7 +1,7 @@
-import { TrackClicks } from "./trackers/blahblah";
+import { TrackClicks } from "./trackers/track_clicks";
 // import { SessionManager } from "./trackers/session";
-import { loadSpeed } from "./trackers/blahblahblah";
-import { PageSpecific } from "./trackers/blah";
+import { loadSpeed } from "./trackers/load_speed";
+import { PageSpecific } from "./trackers/page_specific";
 
 // Add screentime heatmap or analytics/statistics
 loadSpeed();
