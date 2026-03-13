@@ -91,7 +91,7 @@ exports.PageSpecific = PageSpecific;
  * ------------------------- */
 function sendPageMetric(extra = {}) {
     const duration = sessionDurationTimer();
-    navigator.sendBeacon(`https://analytics-backend-2h8r.onrender.com/this_website/${siteID}`, new Blob([
+    navigator.sendBeacon(`https://mysite-component.onrender.com/this_website/${siteID}`, new Blob([
         JSON.stringify({
             page: window.location.pathname,
             pageDuration: duration,
