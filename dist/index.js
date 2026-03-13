@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const blahblah_1 = require("./trackers/blahblah");
+const track_clicks_1 = require("./trackers/track_clicks");
 // import { SessionManager } from "./trackers/session";
-const blahblahblah_1 = require("./trackers/blahblahblah");
-const blah_1 = require("./trackers/blah");
+const load_speed_1 = require("./trackers/load_speed");
+const page_specific_1 = require("./trackers/page_specific");
 // Add screentime heatmap or analytics/statistics
-(0, blahblahblah_1.loadSpeed)();
+(0, load_speed_1.loadSpeed)();
 // SessionManager.init();
-blah_1.PageSpecific.init();
-blahblah_1.TrackClicks.init();
+page_specific_1.PageSpecific.init();
+track_clicks_1.TrackClicks.init();
 /*
 All the metrics are accuratly tracked, now I just need to send them to the server to agrigate data.
 First focus on the side of the person creating a website.

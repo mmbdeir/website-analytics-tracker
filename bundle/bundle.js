@@ -34,9 +34,9 @@
     }
   });
 
-  // dist/trackers/blahblah.js
-  var require_blahblah = __commonJS({
-    "dist/trackers/blahblah.js"(exports) {
+  // dist/trackers/track_clicks.js
+  var require_track_clicks = __commonJS({
+    "dist/trackers/track_clicks.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.TrackClicks = void 0;
@@ -103,9 +103,9 @@
     }
   });
 
-  // dist/trackers/blahblahblah.js
-  var require_blahblahblah = __commonJS({
-    "dist/trackers/blahblahblah.js"(exports) {
+  // dist/trackers/load_speed.js
+  var require_load_speed = __commonJS({
+    "dist/trackers/load_speed.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.loadSpeed = loadSpeed;
@@ -192,9 +192,9 @@
     }
   });
 
-  // dist/trackers/blah.js
-  var require_blah = __commonJS({
-    "dist/trackers/blah.js"(exports) {
+  // dist/trackers/page_specific.js
+  var require_page_specific = __commonJS({
+    "dist/trackers/page_specific.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PageSpecific = void 0;
@@ -323,12 +323,12 @@
   var require_index = __commonJS({
     "dist/index.js"(exports) {
       Object.defineProperty(exports, "__esModule", { value: true });
-      var blahblah_1 = require_blahblah();
-      var blahblahblah_1 = require_blahblahblah();
-      var blah_1 = require_blah();
-      (0, blahblahblah_1.loadSpeed)();
-      blah_1.PageSpecific.init();
-      blahblah_1.TrackClicks.init();
+      var track_clicks_1 = require_track_clicks();
+      var load_speed_1 = require_load_speed();
+      var page_specific_1 = require_page_specific();
+      (0, load_speed_1.loadSpeed)();
+      page_specific_1.PageSpecific.init();
+      track_clicks_1.TrackClicks.init();
     }
   });
   require_index();
