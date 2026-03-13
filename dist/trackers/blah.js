@@ -4,25 +4,24 @@ exports.PageSpecific = void 0;
 require("scrollyfills");
 const onpageexist_1 = require("../reusables/onpageexist");
 const CURRENT_SESSION_START_TIME = "current_session_start_time";
-const siteID = document.querySelector("script[data-site-id]")
-    ?.dataset.siteId;
+const siteID = document.querySelector("script[data-site-id]")?.dataset.siteId;
 class PageSpecific {
-    static navPaths = [];
-    static getMaxScrollDepth = () => 0;
-    static init() {
-        this.navPaths = [window.location.pathname];
-        this.initNavPaths();
-        this.getMaxScrollDepth = this.initScrollDepth();
-        (0, onpageexist_1.SendOnSiteExit)(() => ({
-            navPaths: this.navPaths,
-            pageLeft: window.location.pathname,
-        }));
-        localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
-    }
-    /** -------------------------
-     *  EXIT PAGE FUNCTION
-     * ------------------------- */
-    /*
+  static navPaths = [];
+  static getMaxScrollDepth = () => 0;
+  static init() {
+    this.navPaths = [window.location.pathname];
+    this.initNavPaths();
+    this.getMaxScrollDepth = this.initScrollDepth();
+    (0, onpageexist_1.SendOnSiteExit)(() => ({
+      navPaths: this.navPaths,
+      pageLeft: window.location.pathname,
+    }));
+    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+  }
+  /** -------------------------
+   *  EXIT PAGE FUNCTION
+   * ------------------------- */
+  /*
     private static OnPageExit() {
       if (isDeviceMobile()) {
         document.addEventListener("visibilitychange", (e) => {
@@ -45,89 +44,94 @@ class PageSpecific {
   }
   }
   */
-    /** -------------------------
-     *  NAV PATH TRACKING
-     * ------------------------- */
-    static initNavPaths() {
-        // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
-        const pushNavPaths = () => {
-            let currentPath = window.location.pathname;
-            if (this.navPaths[this.navPaths.length - 1] !== currentPath) {
-                this.navPaths.push(window.location.pathname);
-            }
-            console.log("Nav paths: " + this.navPaths);
-        };
-        onNavigation(pushNavPaths);
+  /** -------------------------
+   *  NAV PATH TRACKING
+   * ------------------------- */
+  static initNavPaths() {
+    // If the navigated path is the same as the current path then dont push it to navPaths, cuz that will create "Nav paths: /mw2, /mw2 , /mw2/coming-soon-screen"
+    const pushNavPaths = () => {
+      let currentPath = window.location.pathname;
+      if (this.navPaths[this.navPaths.length - 1] !== currentPath) {
+        this.navPaths.push(window.location.pathname);
+      }
+      console.log("Nav paths: " + this.navPaths);
+    };
+    onNavigation(pushNavPaths);
+  }
+  /** -------------------------
+   *  SCROLL DEPTH TRACKING
+   * ------------------------- */
+  static initScrollDepth() {
+    let maxDepth = 0;
+    let clientHeight = document.documentElement.clientHeight;
+    function getScrollDepthPercent() {
+      let scrollHeight = document.documentElement.scrollHeight;
+      const maxScroll = scrollHeight - clientHeight;
+      const scroll = window.scrollY;
+      if (maxScroll <= 0) return 100;
+      return (scroll / maxScroll) * 100;
     }
-    /** -------------------------
-     *  SCROLL DEPTH TRACKING
-     * ------------------------- */
-    static initScrollDepth() {
-        let maxDepth = 0;
-        let clientHeight = document.documentElement.clientHeight;
-        function getScrollDepthPercent() {
-            let scrollHeight = document.documentElement.scrollHeight;
-            const maxScroll = scrollHeight - clientHeight;
-            const scroll = window.scrollY;
-            if (maxScroll <= 0)
-                return 100;
-            return (scroll / maxScroll) * 100;
-        }
-        window.addEventListener("scrollend", () => {
-            const currentDepth = getScrollDepthPercent();
-            if (currentDepth > maxDepth) {
-                maxDepth = currentDepth;
-            }
-        });
-        window.addEventListener("resize", () => {
-            clientHeight = document.documentElement.clientHeight;
-        });
-        return () => Math.round(Math.min(100, maxDepth));
-    }
+    window.addEventListener("scrollend", () => {
+      const currentDepth = getScrollDepthPercent();
+      if (currentDepth > maxDepth) {
+        maxDepth = currentDepth;
+      }
+    });
+    window.addEventListener("resize", () => {
+      clientHeight = document.documentElement.clientHeight;
+    });
+    return () => Math.round(Math.min(100, maxDepth));
+  }
 }
 exports.PageSpecific = PageSpecific;
 /** -------------------------
  *  SEND DATA TO SERVER
  * ------------------------- */
 function sendPageMetric(extra = {}) {
-    const duration = sessionDurationTimer();
-    navigator.sendBeacon(`https://mysite-component.onrender.com/this_website/${siteID}`, new Blob([
+  const duration = sessionDurationTimer();
+  navigator.sendBeacon(
+    `https://analytics-backend-2h8r.onrender.com/this_website/${siteID}`,
+    new Blob(
+      [
         JSON.stringify({
-            page: window.location.pathname,
-            pageDuration: duration,
-            scrollDepth: PageSpecific.getMaxScrollDepth(),
-            ...extra,
+          page: window.location.pathname,
+          pageDuration: duration,
+          scrollDepth: PageSpecific.getMaxScrollDepth(),
+          ...extra,
         }),
-    ], { type: "application/json" }));
-    console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
+      ],
+      { type: "application/json" },
+    ),
+  );
+  console.log("maxDepth of previous: " + PageSpecific.getMaxScrollDepth());
 }
 /** -------------------------
  *  ON NAVIGATION
  * ------------------------- */
 function onNavigation(callback) {
-    const originalPushState = history.pushState;
-    history.pushState = function (...args) {
-        originalPushState.apply(history, args);
-        callback();
-        sendPageMetric();
-        PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
-    };
-    const originalReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(history, args);
-        callback();
-        sendPageMetric();
-        PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
-    };
+  const originalPushState = history.pushState;
+  history.pushState = function (...args) {
+    originalPushState.apply(history, args);
+    callback();
+    sendPageMetric();
+    PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
+  };
+  const originalReplaceState = history.replaceState;
+  history.replaceState = function (...args) {
+    originalReplaceState.apply(history, args);
+    callback();
+    sendPageMetric();
+    PageSpecific.getMaxScrollDepth = PageSpecific.initScrollDepth();
+  };
 }
 /** -------------------------
  *  SESSION DURATION TIMER
  * ------------------------- */
 function sessionDurationTimer() {
-    const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
-    const duration = Date.now() - start;
-    localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
-    console.log("Previous page duration: " + duration);
-    return duration;
+  const start = Number(localStorage.getItem(CURRENT_SESSION_START_TIME));
+  const duration = Date.now() - start;
+  localStorage.setItem(CURRENT_SESSION_START_TIME, Date.now().toString());
+  console.log("Previous page duration: " + duration);
+  return duration;
 }
 //# sourceMappingURL=blah.js.map
