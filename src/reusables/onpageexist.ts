@@ -17,7 +17,7 @@ export function SendOnSiteExit(getExtra: () => Record<string, any>) {
 }
 
 function sendPageMetric(extra: Record<string, any> = {}) {
-  fetch(`https://analytics-backend-2h8r.onrender.com/updateMetrics/${siteID}`, {
+  fetch(`https://mysite-component.onrender.com/updateMetrics/${siteID}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(extra),
